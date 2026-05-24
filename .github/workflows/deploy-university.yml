@@ -9,7 +9,6 @@ on:
       - backend/**
       - frontend/**
       - database/**
-      - scripts/db/**
       - deploy/university/**
       - .github/workflows/deploy-university.yml
 
