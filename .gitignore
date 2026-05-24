@@ -54,11 +54,14 @@ blob-report/
 *.pid
 *.out
 *.err
+vite-dev*.log
+vite-mock*.log
 
 # Environment variables and secrets
 .env
 .env.*
 !.env.example
+!.env.mock.example
 *.secret
 secrets/
 
