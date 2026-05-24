@@ -1,4 +1,7 @@
 import type {
+  CompareAnalysisResult,
+  CompareTableExportType,
+  CompareMetricDiff,
   LastAnalysisResult,
   SeoKeywordRow,
   SeoNgramRow,
@@ -7,12 +10,18 @@ import type {
   SeoStructure,
   SeoTableExportType,
   SeoWordRow,
-} from '../types/analysis'
-import type { AppStatePayload } from '../types/api'
-import type { DocumentItem, DocumentPayload, DocumentUpdatePayload } from '../types/documents'
-import { DEFAULT_ANALYSIS_SETTINGS, type AnalysisSettings } from '../types/settings'
+  SpellingCategory,
+  SpellingDocumentResult,
+  SpellingIssue,
+  SpellingResult,
+} from '../Models/analysis'
+import type { AppStatePayload } from '../Models/api'
+import type { DocumentItem, DocumentPayload, DocumentUpdatePayload } from '../Models/documents'
+import { DEFAULT_ANALYSIS_SETTINGS, type AnalysisSettings } from '../Models/settings'
+import { pluralizeRu } from '../Utils/lexema'
 
 type MockScenario = 'empty' | 'documents' | 'seo_done' | 'stale'
+type MockSpellingCategory = 'spelling' | 'grammar' | 'punctuation' | 'style' | 'typography' | 'other'
 
 interface MockClientState {
   documents: DocumentItem[]
@@ -141,6 +150,8 @@ export function createMockDocumentApi(browserId: string, payload: DocumentPayloa
 
     state.documents = [document, ...state.documents]
     invalidateSeo(state, 'Документы изменены')
+    invalidateCompare(state, 'Документы изменены')
+    invalidateSpelling(state, 'Документы изменены')
     setClientState(browserId, state)
 
     return document
@@ -172,6 +183,8 @@ export function updateMockDocumentApi(
       document.id === documentId ? updated : document,
     )
     invalidateSeo(state, 'Документы изменены')
+    invalidateCompare(state, 'Документы изменены')
+    invalidateSpelling(state, 'Документы изменены')
     setClientState(browserId, state)
 
     return updated
@@ -189,6 +202,8 @@ export function deleteMockDocumentApi(browserId: string, documentId: string) {
 
     state.documents = nextDocuments
     invalidateSeo(state, 'Документы изменены')
+    invalidateCompare(state, 'Документы изменены')
+    invalidateSpelling(state, 'Документы изменены')
     setClientState(browserId, state)
 
     return { message: 'Document deleted' }
@@ -204,6 +219,7 @@ export function saveMockSettings(browserId: string, settings: AnalysisSettings) 
     const state = getClientState(browserId)
     state.settings = normalizeSettings(settings)
     invalidateSeo(state, 'Параметры анализа изменены')
+    invalidateCompare(state, 'Параметры анализа изменены')
     setClientState(browserId, state)
 
     return state.settings
@@ -246,12 +262,106 @@ export function runMockSeoAnalysis(
   })
 }
 
+export function runMockCompareAnalysis(
+  browserId: string,
+  documentAId: string,
+  documentBId: string,
+) {
+  return wait().then(() => {
+    const state = getClientState(browserId)
+
+    if (!documentAId || !documentBId) {
+      throw new Error('DOCUMENT_IDS_REQUIRED')
+    }
+
+    if (documentAId === documentBId) {
+      throw new Error('DOCUMENTS_MUST_BE_DIFFERENT')
+    }
+
+    const documentA = state.documents.find((document) => document.id === documentAId)
+    const documentB = state.documents.find((document) => document.id === documentBId)
+
+    if (!documentA || !documentB) {
+      throw new Error('DOCUMENTS_NOT_FOUND')
+    }
+
+    const settings = normalizeSettings(state.settings)
+    const result = buildCompareResult(documentA, documentB, settings)
+    const lastResult: LastAnalysisResult<CompareAnalysisResult> = {
+      analysis_type: 'compare',
+      selected_document_ids: [documentA.id, documentB.id],
+      params_snapshot: settings,
+      result,
+      is_actual: true,
+      invalidation_reason: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+
+    state.last_results.compare = lastResult
+    setClientState(browserId, state)
+
+    return lastResult
+  })
+}
+
+export function runMockSpellingAnalysis(browserId: string, documentIds: string[]) {
+  return wait().then(() => {
+    const state = getClientState(browserId)
+    const selectedDocuments = state.documents.filter((document) => documentIds.includes(document.id))
+
+    if (documentIds.length === 0) {
+      throw new Error('DOCUMENT_IDS_REQUIRED')
+    }
+
+    if (selectedDocuments.length !== documentIds.length) {
+      throw new Error('DOCUMENTS_NOT_FOUND')
+    }
+
+    const result = buildSpellingResult(selectedDocuments)
+    const lastResult: LastAnalysisResult<SpellingResult> = {
+      analysis_type: 'spelling',
+      selected_document_ids: selectedDocuments.map((document) => document.id),
+      params_snapshot: {
+        language: 'auto',
+        engine: 'LanguageTool',
+        max_check_time_millis: 8000,
+      },
+      result,
+      is_actual: true,
+      invalidation_reason: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }
+
+    state.last_results.spelling = lastResult
+    setClientState(browserId, state)
+
+    return lastResult
+  })
+}
+
 export function downloadMockSeoCsv(browserId: string, type: SeoTableExportType) {
   return wait().then(() => {
     const result = requireSeoResult(browserId)
     const { headers, rows } = tableToCsv(type, result)
     const csv = toCsv(headers, rows)
 
+    return new Blob([csv], { type: 'text/csv;charset=utf-8' })
+  })
+}
+
+export function downloadMockCompareCsv(browserId: string, type: CompareTableExportType) {
+  return wait().then(() => {
+    const state = getClientState(browserId)
+    const result = state.last_results.compare?.result
+
+    if (!result) {
+      throw new Error('Сравнительный анализ ещё не выполнен')
+    }
+
+    const { headers, rows } = compareTableToCsv(type, result)
+    const csv = toCsv(headers, rows)
     return new Blob([csv], { type: 'text/csv;charset=utf-8' })
   })
 }
@@ -341,6 +451,35 @@ function createScenarioState(scenario: MockScenario): MockClientState {
       invalidation_reason: scenario === 'stale' ? 'Документы или параметры были изменены' : null,
       created_at: '2026-05-05T15:00:00.000Z',
       updated_at: '2026-05-05T15:00:00.000Z',
+    }
+
+    const spellingResult = buildSpellingResult(documents.slice(0, 2))
+    state.last_results.spelling = {
+      analysis_type: 'spelling',
+      selected_document_ids: documents.slice(0, 2).map((document) => document.id),
+      params_snapshot: {
+        language: 'auto',
+        engine: 'LanguageTool',
+        max_check_time_millis: 8000,
+      },
+      result: spellingResult,
+      is_actual: scenario !== 'stale',
+      invalidation_reason: scenario === 'stale' ? 'Документы изменены' : null,
+      created_at: '2026-05-05T15:05:00.000Z',
+      updated_at: '2026-05-05T15:05:00.000Z',
+    }
+
+    if (documents.length >= 2) {
+      state.last_results.compare = {
+        analysis_type: 'compare',
+        selected_document_ids: [documents[0].id, documents[1].id],
+        params_snapshot: settings,
+        result: buildCompareResult(documents[0], documents[1], settings),
+        is_actual: scenario !== 'stale',
+        invalidation_reason: scenario === 'stale' ? 'Документы или параметры были изменены' : null,
+        created_at: '2026-05-05T15:10:00.000Z',
+        updated_at: '2026-05-05T15:10:00.000Z',
+      }
     }
   }
 
@@ -521,6 +660,284 @@ function buildSeoResult(documents: DocumentItem[], settings: AnalysisSettings): 
   }
 }
 
+function buildCompareResult(
+  documentA: DocumentItem,
+  documentB: DocumentItem,
+  settings: AnalysisSettings,
+): CompareAnalysisResult {
+  const analysisA = buildSeoResult([documentA], settings)
+  const analysisB = buildSeoResult([documentB], settings)
+  const wordsComparison = compareWordRows(analysisA.words, analysisB.words)
+  const ngramsComparison = compareNgramRows(analysisA.ngrams, analysisB.ngrams)
+  const wordFreqA = frequencyMap(analysisA.words, 'word')
+  const wordFreqB = frequencyMap(analysisB.words, 'word')
+  const ngramSetA = new Set(analysisA.ngrams.map((row) => `${row.size}:${row.phrase}`))
+  const ngramSetB = new Set(analysisB.ngrams.map((row) => `${row.size}:${row.phrase}`))
+  const vocabularyOverlap = jaccardPercent(new Set(Object.keys(wordFreqA)), new Set(Object.keys(wordFreqB)))
+  const ngramOverlap = jaccardPercent(ngramSetA, ngramSetB)
+  const cosineSimilarity = cosinePercent(wordFreqA, wordFreqB)
+  const keywordComparison = compareKeywordRows(analysisA.keywords, analysisB.keywords)
+  const waterDiff = round(analysisA.summary.water_percent - analysisB.summary.water_percent)
+
+  return {
+    documents: {
+      a: {
+        document_id: documentA.id,
+        title: documentA.title,
+        char_count: documentA.char_count,
+        word_count: analysisA.summary.total_words,
+      },
+      b: {
+        document_id: documentB.id,
+        title: documentB.title,
+        char_count: documentB.char_count,
+        word_count: analysisB.summary.total_words,
+      },
+    },
+    summary: {
+      word_count_diff: analysisA.summary.total_words - analysisB.summary.total_words,
+      word_count_diff_percent: diffPercent(analysisA.summary.total_words, analysisB.summary.total_words),
+      unique_words_diff: analysisA.summary.unique_words - analysisB.summary.unique_words,
+      water_diff: waterDiff,
+      keyword_coverage_a: analysisA.summary.keyword_coverage_percent,
+      keyword_coverage_b: analysisB.summary.keyword_coverage_percent,
+      vocabulary_overlap_percent: vocabularyOverlap,
+      ngram_overlap_percent: ngramOverlap,
+      cosine_similarity_percent: cosineSimilarity,
+    },
+    metrics: {
+      char_count: metricDiff(documentA.char_count, documentB.char_count),
+      word_count: metricDiff(analysisA.summary.total_words, analysisB.summary.total_words),
+      unique_words: metricDiff(analysisA.summary.unique_words, analysisB.summary.unique_words),
+      water_percent: metricDiff(analysisA.summary.water_percent, analysisB.summary.water_percent),
+      spam_warnings_count: metricDiff(analysisA.summary.spam_warnings_count, analysisB.summary.spam_warnings_count),
+      paragraphs_count: metricDiff(analysisA.structure?.paragraphs_count, analysisB.structure?.paragraphs_count),
+      sentences_count: metricDiff(analysisA.structure?.sentences_count, analysisB.structure?.sentences_count),
+      avg_paragraph_length: metricDiff(analysisA.structure?.avg_words_per_paragraph, analysisB.structure?.avg_words_per_paragraph),
+      avg_sentence_length: metricDiff(analysisA.structure?.avg_words_per_sentence, analysisB.structure?.avg_words_per_sentence),
+    },
+    keywords_comparison: keywordComparison,
+    words_comparison: wordsComparison,
+    ngrams_comparison: ngramsComparison,
+    water_comparison: {
+      a: {
+        percent: analysisA.water.percent,
+        words_count: analysisA.water.water_units_count,
+        status: analysisA.water.level,
+      },
+      b: {
+        percent: analysisB.water.percent,
+        words_count: analysisB.water.water_units_count,
+        status: analysisB.water.level,
+      },
+      diff_percent: waterDiff,
+      words_count: metricDiff(analysisA.water.water_units_count, analysisB.water.water_units_count),
+    },
+    spam_comparison: {
+      a: {
+        risk: analysisA.summary.spam_level,
+        warnings_count: analysisA.spam_warnings.length,
+        warnings: analysisA.spam_warnings.slice(0, 8),
+      },
+      b: {
+        risk: analysisB.summary.spam_level,
+        warnings_count: analysisB.spam_warnings.length,
+        warnings: analysisB.spam_warnings.slice(0, 8),
+      },
+      diff_warnings: analysisA.spam_warnings.length - analysisB.spam_warnings.length,
+    },
+    structure_comparison: {
+      paragraphs_count: metricDiff(analysisA.structure?.paragraphs_count, analysisB.structure?.paragraphs_count),
+      sentences_count: metricDiff(analysisA.structure?.sentences_count, analysisB.structure?.sentences_count),
+      avg_paragraph_length: metricDiff(analysisA.structure?.avg_words_per_paragraph, analysisB.structure?.avg_words_per_paragraph),
+      avg_sentence_length: metricDiff(analysisA.structure?.avg_words_per_sentence, analysisB.structure?.avg_words_per_sentence),
+    },
+    similarity: {
+      vocabulary_overlap_percent: vocabularyOverlap,
+      ngram_overlap_percent: ngramOverlap,
+      cosine_similarity_percent: cosineSimilarity,
+    },
+    insights: buildCompareInsights(
+      analysisA.summary.total_words - analysisB.summary.total_words,
+      keywordComparison.filter((row) => row.status === 'missing_in_a').length,
+      waterDiff,
+      vocabularyOverlap,
+    ),
+  }
+}
+
+function metricDiff(aValue = 0, bValue = 0): CompareMetricDiff {
+  const a = Number(aValue) || 0
+  const b = Number(bValue) || 0
+  const diff = round(a - b)
+
+  return {
+    a: round(a),
+    b: round(b),
+    diff,
+    diff_percent: b === 0 ? null : round(diff / b * 100),
+  }
+}
+
+function diffPercent(a: number, b: number) {
+  return b === 0 ? null : round((a - b) / b * 100)
+}
+
+function compareWordRows(rowsA: SeoWordRow[], rowsB: SeoWordRow[]) {
+  const mapA = new Map(rowsA.map((row) => [row.word, row]))
+  const mapB = new Map(rowsB.map((row) => [row.word, row]))
+  const common = Array.from(mapA.keys())
+    .filter((word) => mapB.has(word))
+    .map((word) => {
+      const rowA = mapA.get(word)!
+      const rowB = mapB.get(word)!
+      return {
+        word,
+        a_count: rowA.count,
+        b_count: rowB.count,
+        a_density: rowA.density,
+        b_density: rowB.density,
+        diff_count: rowA.count - rowB.count,
+        diff_density: round(rowA.density - rowB.density),
+      }
+    })
+    .sort((left, right) => Math.max(right.a_count, right.b_count) - Math.max(left.a_count, left.b_count))
+
+  return {
+    common: common.slice(0, 50),
+    only_a: rowsA
+      .filter((row) => !mapB.has(row.word))
+      .slice(0, 50)
+      .map((row) => ({ word: row.word, count: row.count, density: row.density })),
+    only_b: rowsB
+      .filter((row) => !mapA.has(row.word))
+      .slice(0, 50)
+      .map((row) => ({ word: row.word, count: row.count, density: row.density })),
+  }
+}
+
+function compareNgramRows(rowsA: SeoNgramRow[], rowsB: SeoNgramRow[]) {
+  const keyOf = (row: SeoNgramRow) => `${row.size}:${row.phrase}`
+  const mapA = new Map(rowsA.map((row) => [keyOf(row), row]))
+  const mapB = new Map(rowsB.map((row) => [keyOf(row), row]))
+  const common = Array.from(mapA.keys())
+    .filter((key) => mapB.has(key))
+    .map((key) => {
+      const rowA = mapA.get(key)!
+      const rowB = mapB.get(key)!
+      return {
+        phrase: rowA.phrase,
+        n: rowA.size,
+        a_count: rowA.count,
+        b_count: rowB.count,
+        a_density: rowA.density,
+        b_density: rowB.density,
+        diff_count: rowA.count - rowB.count,
+        diff_density: round(rowA.density - rowB.density),
+      }
+    })
+    .sort((left, right) => Math.max(right.a_count, right.b_count) - Math.max(left.a_count, left.b_count))
+
+  return {
+    common: common.slice(0, 50),
+    only_a: rowsA
+      .filter((row) => !mapB.has(keyOf(row)))
+      .slice(0, 50)
+      .map((row) => ({ phrase: row.phrase, n: row.size, count: row.count, density: row.density })),
+    only_b: rowsB
+      .filter((row) => !mapA.has(keyOf(row)))
+      .slice(0, 50)
+      .map((row) => ({ phrase: row.phrase, n: row.size, count: row.count, density: row.density })),
+  }
+}
+
+function compareKeywordRows(rowsA: SeoKeywordRow[], rowsB: SeoKeywordRow[]) {
+  const mapA = new Map(rowsA.map((row) => [row.keyword, row]))
+  const mapB = new Map(rowsB.map((row) => [row.keyword, row]))
+
+  return Array.from(new Set([...mapA.keys(), ...mapB.keys()])).map((keyword) => {
+    const rowA = mapA.get(keyword)
+    const rowB = mapB.get(keyword)
+    const countA = rowA?.count ?? 0
+    const countB = rowB?.count ?? 0
+    const densityA = rowA?.density ?? 0
+    const densityB = rowB?.density ?? 0
+
+    return {
+      keyword,
+      a: { found: countA > 0, count: countA, density: densityA },
+      b: { found: countB > 0, count: countB, density: densityB },
+      diff_count: countA - countB,
+      diff_density: round(densityA - densityB),
+      status: getCompareKeywordStatus(countA, densityA, countB, densityB),
+    }
+  })
+}
+
+function getCompareKeywordStatus(countA: number, densityA: number, countB: number, densityB: number) {
+  if (countA === 0 && countB > 0) {
+    return 'missing_in_a'
+  }
+  if (countB === 0 && countA > 0) {
+    return 'missing_in_b'
+  }
+  if (countA === countB && Math.abs(densityA - densityB) < 0.01) {
+    return 'same'
+  }
+  return countA > countB || densityA > densityB ? 'higher_in_a' : 'lower_in_a'
+}
+
+function frequencyMap<T extends { count: number }>(rows: T[], key: keyof T) {
+  return rows.reduce<Record<string, number>>((acc, row) => {
+    const value = String(row[key] ?? '')
+    if (value) {
+      acc[value] = row.count
+    }
+    return acc
+  }, {})
+}
+
+function jaccardPercent(setA: Set<string>, setB: Set<string>) {
+  const union = new Set([...setA, ...setB])
+  if (union.size === 0) {
+    return 0
+  }
+  const intersectionSize = Array.from(setA).filter((item) => setB.has(item)).length
+  return round(intersectionSize / union.size * 100)
+}
+
+function cosinePercent(freqA: Record<string, number>, freqB: Record<string, number>) {
+  const keysA = Object.keys(freqA)
+  const keysB = Object.keys(freqB)
+  if (keysA.length === 0 || keysB.length === 0) {
+    return 0
+  }
+
+  const dot = keysA.reduce((sum, key) => sum + (freqA[key] ?? 0) * (freqB[key] ?? 0), 0)
+  const normA = Math.sqrt(keysA.reduce((sum, key) => sum + freqA[key] ** 2, 0))
+  const normB = Math.sqrt(keysB.reduce((sum, key) => sum + freqB[key] ** 2, 0))
+  return normA && normB ? round(dot / (normA * normB) * 100) : 0
+}
+
+function buildCompareInsights(wordDiff: number, missingKeywords: number, waterDiff: number, vocabularyOverlap: number) {
+  return [
+    wordDiff === 0
+      ? null
+      : wordDiff < 0
+      ? { type: 'info', code: 'A_SHORTER_THAN_B', message: `Текст A короче референса на ${Math.abs(wordDiff)} ${pluralizeRu(wordDiff, ['слово', 'слова', 'слов'])}.` }
+      : { type: 'info', code: 'A_LONGER_THAN_B', message: `Текст A длиннее референса на ${wordDiff} ${pluralizeRu(wordDiff, ['слово', 'слова', 'слов'])}.` },
+    missingKeywords > 0
+      ? { type: 'warning', code: 'KEYWORDS_MISSING_IN_A', message: `В тексте A отсутствуют ${missingKeywords} ${pluralizeRu(missingKeywords, ['ключевая фраза', 'ключевые фразы', 'ключевых фраз'])}, которые есть в референсе.` }
+      : null,
+    waterDiff > 5
+      ? { type: 'warning', code: 'A_WATER_HIGHER', message: `В тексте A водность выше на ${waterDiff}%.` }
+      : null,
+    vocabularyOverlap < 40
+      ? { type: 'info', code: 'LOW_VOCABULARY_OVERLAP', message: 'Словарное пересечение текстов ниже 40%.' }
+      : null,
+  ].filter((item): item is { type: string; code: string; message: string } => Boolean(item))
+}
+
 function normalizeSettings(settings: AnalysisSettings): AnalysisSettings {
   return {
     stop_words: {
@@ -547,6 +964,169 @@ function invalidateSeo(state: MockClientState, reason: string) {
       updated_at: new Date().toISOString(),
     }
   }
+}
+
+function invalidateCompare(state: MockClientState, reason: string) {
+  if (state.last_results.compare) {
+    state.last_results.compare = {
+      ...state.last_results.compare,
+      is_actual: false,
+      invalidation_reason: reason,
+      updated_at: new Date().toISOString(),
+    }
+  }
+}
+
+function invalidateSpelling(state: MockClientState, reason: string) {
+  if (state.last_results.spelling) {
+    state.last_results.spelling = {
+      ...state.last_results.spelling,
+      is_actual: false,
+      invalidation_reason: reason,
+      updated_at: new Date().toISOString(),
+    }
+  }
+}
+
+function buildSpellingResult(documents: DocumentItem[]): SpellingResult {
+  const checkedAt = new Date().toISOString()
+  const checkedDocuments = documents.map(buildSpellingDocumentResult)
+  const allIssues = checkedDocuments.flatMap((document) => document.issues)
+  const languages = Array.from(new Set(checkedDocuments.map((document) => document.language)))
+
+  return {
+    summary: {
+      documents_count: documents.length,
+      total_issues: allIssues.length,
+      spelling_count: countSpellingIssues(allIssues, 'spelling'),
+      grammar_count: countSpellingIssues(allIssues, 'grammar'),
+      punctuation_count: countSpellingIssues(allIssues, 'punctuation'),
+      style_count: countSpellingIssues(allIssues, 'style'),
+      typography_count: countSpellingIssues(allIssues, 'typography'),
+      other_count: countSpellingIssues(allIssues, 'other'),
+      unknown_count: countSpellingIssues(allIssues, 'other'),
+      languages,
+      checked_at: checkedAt,
+      engine: 'LanguageTool',
+      max_check_time_millis: 8000,
+    },
+    documents: checkedDocuments,
+  }
+}
+
+function buildSpellingDocumentResult(document: DocumentItem): SpellingDocumentResult {
+  const language = detectMockLanguage(document.content)
+  const specs: Array<{
+    category: MockSpellingCategory
+    message: string
+    replacement: string
+    rule: string
+    word?: string
+  }> = [
+    {
+      category: 'spelling',
+      message: 'Проверьте написание слова',
+      replacement: 'орфографические',
+      rule: 'MOCK_SPELLING',
+    },
+    {
+      category: 'grammar',
+      message: 'Возможна грамматическая ошибка',
+      replacement: 'грамматические',
+      rule: 'MOCK_GRAMMAR',
+    },
+    {
+      category: 'punctuation',
+      message: 'Проверьте пунктуацию рядом с фрагментом',
+      replacement: 'ошибки,',
+      rule: 'MOCK_PUNCTUATION',
+    },
+    {
+      category: 'style',
+      message: 'Фрагмент выглядит стилистически слабым',
+      replacement: 'точнее',
+      rule: 'MOCK_STYLE',
+    },
+    {
+      category: 'typography',
+      message: 'Проверьте типографику и пробелы',
+      replacement: '—',
+      rule: 'MOCK_TYPOGRAPHY',
+    },
+    {
+      category: 'other',
+      message: 'Дополнительное замечание проверки',
+      replacement: '',
+      rule: 'MOCK_OTHER',
+    },
+  ]
+  const words = document.content.match(/[A-Za-zА-Яа-яЁё]+(?:[-'][A-Za-zА-Яа-яЁё]+)*/g) ?? []
+  const issues = specs
+    .map((spec, index) => {
+      const fallbackWord = words[index * 2] ?? words[index] ?? document.content.slice(0, 8)
+      return createMockSpellingIssue(document, spec, fallbackWord, index + 1, language)
+    })
+    .filter((issue): issue is SpellingIssue => Boolean(issue))
+
+  return {
+    document_id: document.id,
+    title: document.title,
+    language,
+    text_length: document.content.length,
+    checked_char_count: document.content.length,
+    truncated: false,
+    issues_count: issues.length,
+    issues,
+  }
+}
+
+function createMockSpellingIssue(
+  document: DocumentItem,
+  spec: {
+    category: MockSpellingCategory
+    message: string
+    replacement: string
+    rule: string
+    word?: string
+  },
+  fallbackWord: string,
+  index: number,
+  language: string,
+): SpellingIssue | null {
+  const word = spec.word || fallbackWord
+  const offset = document.content.indexOf(word)
+
+  if (offset < 0 || !word) {
+    return null
+  }
+
+  return {
+    id: `${document.id}-spell-${index}`,
+    rule_id: spec.rule,
+    message: spec.message,
+    short_message: spec.message,
+    category: spec.category,
+    category_name: spec.category,
+    severity: spec.category === 'spelling' ? 'error' : spec.category === 'style' || spec.category === 'typography' ? 'info' : 'warning',
+    offset,
+    length: word.length,
+    context: document.content.slice(Math.max(0, offset - 30), Math.min(document.content.length, offset + word.length + 30)),
+    context_offset: Math.min(30, offset),
+    word,
+    replacements: spec.replacement ? [spec.replacement] : [],
+    sentence: document.content.slice(Math.max(0, offset - 60), Math.min(document.content.length, offset + word.length + 60)),
+    language,
+  }
+}
+
+function countSpellingIssues(issues: SpellingIssue[], category: SpellingCategory) {
+  return issues.filter((issue) => issue.category === category).length
+}
+
+function detectMockLanguage(text: string) {
+  const cyrillic = text.match(/[А-Яа-яЁё]/g)?.length ?? 0
+  const latin = text.match(/[A-Za-z]/g)?.length ?? 0
+  return cyrillic >= latin ? 'ru-RU' : 'en-US'
 }
 
 function requireSeoResult(browserId: string) {
@@ -610,6 +1190,62 @@ function tableToCsv(type: SeoTableExportType, result: SeoResult) {
     fileName: 'seo_mixed.csv',
     headers: ['Слово', 'Частота', 'Предложение'],
     rows: result.mixed_alphabet_words.map((row) => [row.word, row.count, row.suggestion]),
+  }
+}
+
+function compareTableToCsv(type: CompareTableExportType, result: CompareAnalysisResult): {
+  headers: string[]
+  rows: Array<Array<string | number | boolean>>
+  fileName: string
+} {
+  if (type === 'words') {
+    return {
+      headers: ['Слово', 'A частота', 'B частота', 'A плотность', 'B плотность', 'Разница частоты', 'Разница плотности'],
+      rows: result.words_comparison.common.map((row) => [
+        row.word,
+        row.a_count,
+        row.b_count,
+        row.a_density ?? 0,
+        row.b_density ?? 0,
+        row.diff_count,
+        row.diff_density ?? 0,
+      ]),
+      fileName: 'compare_words.csv',
+    }
+  }
+
+  if (type === 'ngrams') {
+    return {
+      headers: ['Фраза', 'N', 'A частота', 'B частота', 'A плотность', 'B плотность', 'Разница частоты', 'Разница плотности'],
+      rows: result.ngrams_comparison.common.map((row) => [
+        row.phrase,
+        row.n ?? '',
+        row.a_count,
+        row.b_count,
+        row.a_density ?? 0,
+        row.b_density ?? 0,
+        row.diff_count,
+        row.diff_density ?? 0,
+      ]),
+      fileName: 'compare_ngrams.csv',
+    }
+  }
+
+  return {
+    headers: ['Ключ', 'A найден', 'A частота', 'A плотность', 'B найден', 'B частота', 'B плотность', 'Разница частоты', 'Разница плотности', 'Статус'],
+    rows: result.keywords_comparison.map((row) => [
+      row.keyword,
+      row.a.found ? 'да' : 'нет',
+      row.a.count,
+      row.a.density,
+      row.b.found ? 'да' : 'нет',
+      row.b.count,
+      row.b.density,
+      row.diff_count,
+      row.diff_density,
+      row.status,
+    ]),
+    fileName: 'compare_keywords.csv',
   }
 }
 

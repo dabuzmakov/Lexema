@@ -1,5 +1,5 @@
 import { createQuery, requestJson, USE_MOCK_API } from './http'
-import type { DocumentItem, DocumentPayload, DocumentUpdatePayload } from '../types/documents'
+import type { DocumentItem, DocumentPayload, DocumentUpdatePayload } from '../Models/documents'
 
 export async function getDocuments(browserId: string) {
   if (USE_MOCK_API) {

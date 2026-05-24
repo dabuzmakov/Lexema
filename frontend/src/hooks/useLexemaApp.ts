@@ -1,18 +1,19 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from 'react'
-import { getAppState } from '../api/appApi'
-import { runSeoAnalysis } from '../api/analysisApi'
+import { getAppState } from '../Api/appApi'
+import { runSeoAnalysis, runSpellingAnalysis } from '../Api/analysisApi'
+import { runCompareAnalysis } from '../Api/compareApi'
 import {
   createDocument,
   deleteDocument,
   updateDocument,
-} from '../api/documentsApi'
-import { downloadSeoCsv, downloadSeoZip } from '../api/exportApi'
-import { saveSettings } from '../api/settingsApi'
+} from '../Api/documentsApi'
+import { downloadCompareCsv, downloadSeoCsv, downloadSeoZip } from '../Api/exportApi'
+import { saveSettings } from '../Api/settingsApi'
 import {
   DEFAULT_DISPLAY_SETTINGS,
   DISPLAY_SETTINGS_STORAGE_KEY,
   MAX_DOCUMENTS,
-} from '../shared/constants/lexema'
+} from '../Utils/lexemaConstants'
 import {
   createMarkdownTable,
   getOrCreateBrowserId,
@@ -22,28 +23,32 @@ import {
   normalizeDisplaySettings,
   readTextFile,
   sanitizeDocumentTitle,
-  splitTextarea,
-} from '../shared/utils/lexema'
+} from '../Utils/lexema'
 import type {
   LastAnalysisResult,
+  CompareAnalysisResult,
+  CompareTableExportType,
   SeoKeywordRow,
   SeoNgramRow,
   SeoResult,
   SeoTableExportType,
   SeoWordRow,
-} from '../types/analysis'
-import type { DocumentItem } from '../types/documents'
+  SpellingResult,
+} from '../Models/analysis'
+import type { DocumentItem } from '../Models/documents'
 import {
   DEFAULT_ANALYSIS_SETTINGS,
   type AnalysisSettings,
   type StopWordsMode,
-} from '../types/settings'
-import type { DisplaySettings, DocumentModalState, TabId, WordSort } from '../types/ui'
+} from '../Models/settings'
+import type { DisplaySettings, DocumentModalState, TabId, WordSort } from '../Models/ui'
 
 type AppMessage = {
   text: string
   variant?: 'copy' | 'info'
 }
+
+type UploadContext = 'seo' | 'compare' | 'spelling'
 
 export function useLexemaApp() {
   const [browserId] = useState(getOrCreateBrowserId)
@@ -53,7 +58,13 @@ export function useLexemaApp() {
   const [settingsDraft, setSettingsDraft] =
     useState<AnalysisSettings>(DEFAULT_ANALYSIS_SETTINGS)
   const [seoResult, setSeoResult] = useState<LastAnalysisResult<SeoResult> | null>(null)
+  const [compareResult, setCompareResult] = useState<LastAnalysisResult<CompareAnalysisResult> | null>(null)
+  const [spellingResult, setSpellingResult] = useState<LastAnalysisResult<SpellingResult> | null>(null)
   const [selectedSeoDocumentIds, setSelectedSeoDocumentIds] = useState<string[]>([])
+  const [compareDocumentAId, setCompareDocumentAId] = useState<string | null>(null)
+  const [compareDocumentBId, setCompareDocumentBId] = useState<string | null>(null)
+  const [selectedSpellingDocumentIds, setSelectedSpellingDocumentIds] = useState<string[]>([])
+  const [currentSpellingDocumentId, setCurrentSpellingDocumentId] = useState<string | null>(null)
   const [selectedDocumentIds, setSelectedDocumentIds] = useState<string[]>([])
   const [documentSearch, setDocumentSearch] = useState('')
   const [modal, setModal] = useState<DocumentModalState | null>(null)
@@ -61,7 +72,11 @@ export function useLexemaApp() {
   const [isDocumentSaving, setIsDocumentSaving] = useState(false)
   const [isSettingsSaving, setIsSettingsSaving] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [isCompareAnalyzing, setIsCompareAnalyzing] = useState(false)
+  const [isSpellingAnalyzing, setIsSpellingAnalyzing] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
+  const [spellingErrorMessage, setSpellingErrorMessage] = useState<string | null>(null)
+  const [compareErrorMessage, setCompareErrorMessage] = useState<string | null>(null)
   const [message, setMessage] = useState<AppMessage | null>(null)
   const [displaySettings, setDisplaySettings] = useState<DisplaySettings>(getStoredDisplaySettings)
   const [displaySettingsDraft, setDisplaySettingsDraft] =
@@ -83,10 +98,12 @@ export function useLexemaApp() {
         }
 
         setDocuments(state.documents)
-        const normalizedSettings = normalizeAnalysisSettings(state.settings, { migrateLegacyDefault: true })
+        const normalizedSettings = normalizeAnalysisSettings(state.settings, { migrateDefaultThreshold: true })
         setSettings(normalizedSettings)
         setSettingsDraft(normalizedSettings)
         setSeoResult(state.last_results.seo)
+        setCompareResult(state.last_results.compare)
+        setSpellingResult(state.last_results.spelling)
 
         const restoredSelection = state.last_results.seo?.selected_document_ids ?? []
         setSelectedSeoDocumentIds(
@@ -94,6 +111,21 @@ export function useLexemaApp() {
             ? restoredSelection
             : state.documents.map((document) => document.id),
         )
+
+        const restoredCompareSelection = state.last_results.compare?.selected_document_ids ?? []
+        const initialCompareAId = restoredCompareSelection[0] ?? state.documents[0]?.id ?? null
+        const initialCompareBId = restoredCompareSelection[1]
+          ?? state.documents.find((document) => document.id !== initialCompareAId)?.id
+          ?? null
+        setCompareDocumentAId(initialCompareAId)
+        setCompareDocumentBId(initialCompareBId)
+
+        const restoredSpellingSelection = state.last_results.spelling?.selected_document_ids ?? []
+        const nextSpellingSelection = restoredSpellingSelection.length > 0
+          ? restoredSpellingSelection
+          : state.documents.slice(0, 1).map((document) => document.id)
+        setSelectedSpellingDocumentIds(nextSpellingSelection)
+        setCurrentSpellingDocumentId(nextSpellingSelection[0] ?? null)
       })
       .catch((error: Error) => showMessage(error.message))
       .finally(() => {
@@ -122,6 +154,21 @@ export function useLexemaApp() {
   const selectedSeoDocuments = useMemo(
     () => documents.filter((document) => selectedSeoDocumentIds.includes(document.id)),
     [documents, selectedSeoDocumentIds],
+  )
+
+  const selectedSpellingDocuments = useMemo(
+    () => documents.filter((document) => selectedSpellingDocumentIds.includes(document.id)),
+    [documents, selectedSpellingDocumentIds],
+  )
+
+  const compareDocumentA = useMemo(
+    () => documents.find((document) => document.id === compareDocumentAId) ?? null,
+    [compareDocumentAId, documents],
+  )
+
+  const compareDocumentB = useMemo(
+    () => documents.find((document) => document.id === compareDocumentBId) ?? null,
+    [compareDocumentBId, documents],
   )
 
   const filteredWords = useMemo(() => {
@@ -171,7 +218,7 @@ export function useLexemaApp() {
     }
   }
 
-  async function handleFiles(files: FileList | File[]) {
+  async function handleFiles(files: FileList | File[], context?: UploadContext) {
     const selectedFiles = Array.from(files).filter((file) => file.name.endsWith('.txt'))
 
     if (selectedFiles.length === 0) {
@@ -206,12 +253,34 @@ export function useLexemaApp() {
       }
 
       if (createdDocuments.length > 0) {
+        const createdIds = createdDocuments.map((document) => document.id)
+
         setDocuments((current) => [...createdDocuments, ...current])
-        setSelectedSeoDocumentIds((current) => [
-          ...createdDocuments.map((document) => document.id),
-          ...current,
-        ])
+        if (!context || context === 'seo') {
+          setSelectedSeoDocumentIds((current) => [
+            ...createdIds,
+            ...current,
+          ])
+        }
+
+        if (context === 'spelling') {
+          setSelectedSpellingDocumentIds((current) => [
+            ...createdIds,
+            ...current,
+          ])
+          setCurrentSpellingDocumentId((current) => current ?? createdIds[0] ?? null)
+        }
+
+        if (context === 'compare') {
+          const nextAId = compareDocumentAId ?? createdIds[0] ?? null
+          const nextBId = compareDocumentBId ?? createdIds.find((id) => id !== nextAId) ?? null
+
+          setCompareDocumentAId(nextAId)
+          setCompareDocumentBId(nextBId)
+        }
         setSeoResult((current) => markSeoStale(current, 'Документы изменены'))
+        setCompareResult((current) => markSeoStale(current, 'Документы изменены'))
+        setSpellingResult((current) => markSeoStale(current, 'Документы изменены'))
       }
     } catch (error) {
       showMessage(error instanceof Error ? error.message : 'Не удалось загрузить документ')
@@ -278,6 +347,8 @@ export function useLexemaApp() {
       }
 
       setSeoResult((current) => markSeoStale(current, 'Документы изменены'))
+      setCompareResult((current) => markSeoStale(current, 'Документы изменены'))
+      setSpellingResult((current) => markSeoStale(current, 'Документы изменены'))
       setModal(null)
     } catch (error) {
       showMessage(error instanceof Error ? error.message : 'Не удалось сохранить документ')
@@ -293,7 +364,13 @@ export function useLexemaApp() {
       setDocuments((current) => current.filter((document) => document.id !== documentId))
       setSelectedDocumentIds((current) => current.filter((id) => id !== documentId))
       setSelectedSeoDocumentIds((current) => current.filter((id) => id !== documentId))
+      setCompareDocumentAId((current) => (current === documentId ? null : current))
+      setCompareDocumentBId((current) => (current === documentId ? null : current))
+      setSelectedSpellingDocumentIds((current) => current.filter((id) => id !== documentId))
+      setCurrentSpellingDocumentId((current) => (current === documentId ? null : current))
       setSeoResult((current) => markSeoStale(current, 'Документы изменены'))
+      setCompareResult((current) => markSeoStale(current, 'Документы изменены'))
+      setSpellingResult((current) => markSeoStale(current, 'Документы изменены'))
     } catch (error) {
       showMessage(error instanceof Error ? error.message : 'Не удалось удалить документ')
     } finally {
@@ -315,8 +392,22 @@ export function useLexemaApp() {
       setSelectedSeoDocumentIds((current) =>
         current.filter((id) => !selectedDocumentIds.includes(id)),
       )
+      setSelectedSpellingDocumentIds((current) =>
+        current.filter((id) => !selectedDocumentIds.includes(id)),
+      )
+      setCompareDocumentAId((current) =>
+        current && selectedDocumentIds.includes(current) ? null : current,
+      )
+      setCompareDocumentBId((current) =>
+        current && selectedDocumentIds.includes(current) ? null : current,
+      )
+      setCurrentSpellingDocumentId((current) =>
+        current && selectedDocumentIds.includes(current) ? null : current,
+      )
       setSelectedDocumentIds([])
       setSeoResult((current) => markSeoStale(current, 'Документы изменены'))
+      setCompareResult((current) => markSeoStale(current, 'Документы изменены'))
+      setSpellingResult((current) => markSeoStale(current, 'Документы изменены'))
     } catch (error) {
       showMessage(error instanceof Error ? error.message : 'Не удалось удалить документы')
     } finally {
@@ -338,6 +429,38 @@ export function useLexemaApp() {
         ? current.filter((id) => id !== documentId)
         : [...current, documentId],
     )
+  }
+
+  function selectSpellingDocument(documentId: string) {
+    setSelectedSpellingDocumentIds((current) =>
+      current.includes(documentId) ? current : [...current, documentId],
+    )
+    setCurrentSpellingDocumentId((current) => current ?? documentId)
+  }
+
+  function removeSpellingDocument(documentId: string) {
+    setSelectedSpellingDocumentIds((current) => {
+      const nextIds = current.filter((id) => id !== documentId)
+      setCurrentSpellingDocumentId((currentDocumentId) => {
+        if (currentDocumentId !== documentId) {
+          return currentDocumentId
+        }
+        return nextIds[0] ?? null
+      })
+      return nextIds
+    })
+  }
+
+  function selectCompareDocumentA(documentId: string | null) {
+    setCompareDocumentAId(documentId)
+    setCompareResult(null)
+    setCompareErrorMessage(null)
+  }
+
+  function selectCompareDocumentB(documentId: string | null) {
+    setCompareDocumentBId(documentId)
+    setCompareResult(null)
+    setCompareErrorMessage(null)
   }
 
   function updateSettingsDraft(nextSettings: Partial<AnalysisSettings>) {
@@ -386,6 +509,7 @@ export function useLexemaApp() {
 
       if (analysisSettingsChanged) {
         setSeoResult((current) => markSeoStale(current, 'Параметры анализа изменены'))
+        setCompareResult((current) => markSeoStale(current, 'Параметры анализа изменены'))
       }
 
       showMessage('Параметры сохранены')
@@ -420,10 +544,97 @@ export function useLexemaApp() {
     }
   }
 
+  async function handleRunCompareAnalysis() {
+    if (documents.length < 2) {
+      setCompareErrorMessage('Для сравнения нужно минимум два документа')
+      showMessage('Для сравнения нужно минимум два документа')
+      return
+    }
+
+    if (!compareDocumentAId || !compareDocumentBId) {
+      setCompareErrorMessage('Выберите два документа для сравнения')
+      showMessage('Выберите два документа для сравнения')
+      return
+    }
+
+    if (compareDocumentAId === compareDocumentBId) {
+      setCompareErrorMessage('Для сравнения выберите разные документы')
+      showMessage('Для сравнения выберите разные документы')
+      return
+    }
+
+    setIsCompareAnalyzing(true)
+    setCompareErrorMessage(null)
+    try {
+      const result = await runCompareAnalysis(browserId, compareDocumentAId, compareDocumentBId)
+      setCompareResult(result)
+      setCompareDocumentAId(result.selected_document_ids[0] ?? compareDocumentAId)
+      setCompareDocumentBId(result.selected_document_ids[1] ?? compareDocumentBId)
+      showMessage('Сравнительный анализ выполнен')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Не удалось выполнить сравнительный анализ'
+      setCompareErrorMessage(message)
+      showMessage(message)
+    } finally {
+      setIsCompareAnalyzing(false)
+    }
+  }
+
+  function handleClearCompare() {
+    setCompareDocumentAId(null)
+    setCompareDocumentBId(null)
+    setCompareResult(null)
+    setCompareErrorMessage(null)
+  }
+
+  async function handleRunSpellingAnalysis() {
+    if (selectedSpellingDocumentIds.length === 0) {
+      showMessage('Выберите хотя бы один документ')
+      return
+    }
+
+    setIsSpellingAnalyzing(true)
+    setSpellingErrorMessage(null)
+    try {
+      const result = await runSpellingAnalysis(browserId, selectedSpellingDocumentIds)
+      setSpellingResult(result)
+      setSelectedSpellingDocumentIds(result.selected_document_ids)
+      setCurrentSpellingDocumentId(result.selected_document_ids[0] ?? null)
+      showMessage('Проверка орфографии выполнена')
+    } catch (error) {
+      const rawMessage = error instanceof Error ? error.message : 'Не удалось выполнить проверку орфографии'
+      const message = rawMessage === 'SPELLING_ENGINE_UNAVAILABLE'
+        ? 'Сервис проверки орфографии временно недоступен. Проверьте, что на сервере настроен LanguageTool/Java.'
+        : rawMessage
+      setSpellingErrorMessage(message)
+      showMessage(message)
+    } finally {
+      setIsSpellingAnalyzing(false)
+    }
+  }
+
+  function handleClearSpelling() {
+    setSpellingResult(null)
+    setSpellingErrorMessage(null)
+    setSelectedSpellingDocumentIds([])
+    setCurrentSpellingDocumentId(null)
+  }
+
   async function handleCsvExport(type: SeoTableExportType) {
     setIsExporting(true)
     try {
       await downloadSeoCsv(type, browserId)
+    } catch (error) {
+      showMessage(error instanceof Error ? error.message : 'Не удалось экспортировать CSV')
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  async function handleCompareCsvExport(type: CompareTableExportType) {
+    setIsExporting(true)
+    try {
+      await downloadCompareCsv(type, browserId)
     } catch (error) {
       showMessage(error instanceof Error ? error.message : 'Не удалось экспортировать CSV')
     } finally {
@@ -487,6 +698,12 @@ export function useLexemaApp() {
   return {
     activeTab,
     canUpload,
+    compareDocumentA,
+    compareDocumentAId,
+    compareDocumentB,
+    compareDocumentBId,
+    compareErrorMessage,
+    compareResult,
     corpusSummary,
     documentSearch,
     documents,
@@ -495,18 +712,25 @@ export function useLexemaApp() {
     filteredNgrams,
     filteredWords,
     handleCsvExport,
+    handleCompareCsvExport,
     handleDeleteDocument,
     handleDeleteSelectedDocuments,
     handleDocumentSubmit,
     handleFileInput,
     handleFiles,
+    handleClearCompare,
+    handleRunCompareAnalysis,
     handleRunSeoAnalysis,
+    handleRunSpellingAnalysis,
     handleSaveSettings,
     handleZipExport,
+    handleClearSpelling,
     isAnalyzing,
     isAppLoading,
+    isCompareAnalyzing,
     isDocumentSaving,
     isExporting,
+    isSpellingAnalyzing,
     isSettingsSaving,
     message,
     modal,
@@ -519,6 +743,8 @@ export function useLexemaApp() {
     selectedDocumentIds,
     selectedSeoDocumentIds,
     selectedSeoDocuments,
+    selectedSpellingDocumentIds,
+    selectedSpellingDocuments,
     seoResult,
     setActiveTab,
     setDocumentSearch,
@@ -527,12 +753,17 @@ export function useLexemaApp() {
     setNgramTopN,
     setSelectedDocumentIds,
     setSelectedSeoDocumentIds,
+    setCompareDocumentAId,
+    setCompareDocumentBId,
+    setCurrentSpellingDocumentId,
     setStopWordsMode,
     setWordMinLength,
     setWordSort,
     setWordTopN,
     settings,
     settingsDraft,
+    spellingErrorMessage,
+    spellingResult,
     toggleDocumentSelection,
     toggleNgramSize,
     toggleSeoDocument,
@@ -543,5 +774,10 @@ export function useLexemaApp() {
     copyKeywordsMarkdown,
     copyNgramsMarkdown,
     copyWordsMarkdown,
+    currentSpellingDocumentId,
+    removeSpellingDocument,
+    selectSpellingDocument,
+    selectCompareDocumentA,
+    selectCompareDocumentB,
   }
 }

@@ -1,0 +1,595 @@
+/* Settings page, document modal, placeholder states. Cascade layer; keep import order in src/App/Styles.module.scss. */
+.settingsPage {
+  --settings-page-offset: calc(var(--content-block-start) + var(--content-inline-space));
+  --settings-block-gap: clamp(22px, 2.3vh, 28px);
+
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--settings-block-gap);
+  height: calc(100dvh - var(--settings-page-offset));
+  min-height: 0;
+  width: 100%;
+}
+
+.settingsPage .pageTitle {
+  margin-top: clamp(18px, 2.1vw, 30px);
+  margin-bottom: 0;
+}
+
+.settingsLayout {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: var(--settings-block-gap);
+  align-content: stretch;
+  min-height: 0;
+  height: 100%;
+  padding-bottom: 0;
+  overflow: visible;
+}
+
+.settingsPanelGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(16px, 1.5vw, 24px);
+  align-items: stretch;
+  min-height: 0;
+  height: 100%;
+}
+
+.settingsPanel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: clamp(22px, 2.4vh, 32px);
+  min-height: 0;
+  height: 100%;
+  padding: clamp(24px, 2.1vw, 36px) clamp(28px, 2.7vw, 44px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  overflow: visible;
+}
+
+.settingsWordsPanel,
+.settingsAnalysisPanel {
+  min-width: 0;
+}
+
+.settingsAnalysisPanel {
+  container-type: inline-size;
+}
+
+.settingsWordsPanel {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.settingsPanelTitle {
+  display: flex;
+  gap: clamp(12px, 1vw, 16px);
+  align-items: center;
+  min-height: clamp(38px, 4vh, 46px);
+}
+
+.settingsPanelTitle > span {
+  display: grid;
+  flex: 0 0 auto;
+  width: clamp(36px, 2.7vw, 44px);
+  height: clamp(36px, 2.7vw, 44px);
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border-radius: 10px;
+  place-items: center;
+}
+
+.settingsPanelTitle h2 {
+  font-size: clamp(18px, 1.35vw, 24px);
+  line-height: 1.1;
+}
+
+.settingsWordsContent {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 0;
+}
+
+.settingsField {
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: clamp(10px, 1.1vh, 14px);
+  align-items: start;
+  min-height: 0;
+}
+
+.settingsField .settingsTextareaWrap {
+  min-height: 0;
+}
+
+.settingsField textarea {
+  height: var(--settings-textarea-height);
+}
+
+.settingsAnalysisContent {
+  display: grid;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  min-height: 0;
+}
+
+.settingsAnalysisRow {
+  --settings-control-column: clamp(152px, 32cqi, 206px);
+  --settings-inner-control: clamp(132px, 25cqi, 152px);
+  --settings-text-column: minmax(220px, clamp(300px, 46cqi, 430px));
+
+  display: grid;
+  grid-template-columns: var(--settings-text-column) var(--settings-control-column);
+  column-gap: clamp(10px, 1.4vw, 22px);
+  align-items: center;
+  justify-content: space-around;
+  min-height: 0;
+  padding-block: clamp(16px, 2.1vh, 28px);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.settingsAnalysisRow:last-child {
+  border-bottom: 0;
+}
+
+.settingsAnalysisText {
+  justify-self: start;
+  width: 100%;
+}
+
+.settingsControlCell {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  justify-items: center;
+}
+
+.settingsSeoSpamControl {
+  display: grid;
+  width: var(--settings-inner-control);
+  justify-items: center;
+}
+
+.settingsSeoSpamControl > div {
+  width: 100%;
+}
+
+.settingsNgramControl {
+  display: grid;
+  width: var(--settings-inner-control);
+  min-width: 0;
+  justify-items: center;
+}
+
+.settingsSeoSpamControl small {
+  display: block;
+  margin-top: 7px;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.settingLabel {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.settingLabel > span {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.settingLabel b {
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.settingLabel p {
+  max-width: 34ch;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.settingsField .settingLabel p {
+  max-width: none;
+  white-space: nowrap;
+}
+
+.infoHint {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  color: var(--color-muted);
+  cursor: help;
+  border: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.infoHint svg {
+  display: block;
+}
+
+.infoTooltip {
+  position: fixed;
+  z-index: 100;
+  padding: 9px 11px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: left;
+  pointer-events: none;
+  background: #111827;
+  border-radius: 8px;
+  box-shadow: 0 12px 30px rgb(15 23 42 / 18%);
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+}
+
+.segmented button {
+  min-height: 38px;
+  min-width: 0;
+  padding: 0 10px;
+  overflow: hidden;
+  color: var(--color-muted);
+  font-size: 13px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 0;
+  border-right: 1px solid var(--color-border);
+}
+
+.segmented:has(.segmentedActive) button {
+  border-right-color: transparent;
+}
+
+.segmented button:last-child {
+  border-right: 0;
+}
+
+.segmentedActive {
+  color: #fff !important;
+  background: var(--color-primary);
+  border-radius: var(--radius-control);
+  box-shadow: inset 0 0 0 1px var(--color-primary);
+}
+
+.settingsTextareaWrap {
+  position: relative;
+  min-width: 0;
+}
+
+.settingsTextareaWrap textarea {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  height: var(--settings-textarea-height, clamp(92px, 13vh, 150px));
+  padding: 13px 14px;
+  resize: none;
+  overflow-y: auto;
+}
+
+.settingsToggleRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: start;
+  min-width: 0;
+}
+
+.toggle {
+  flex: 0 0 auto;
+  width: 50px;
+  height: 28px;
+  padding: 3px;
+  cursor: pointer;
+  background: var(--color-track);
+  border: 0;
+  border-radius: 999px;
+}
+
+.toggle span {
+  display: block;
+  width: 22px;
+  height: 22px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.18s ease;
+}
+
+.toggleActive {
+  background: var(--color-primary);
+}
+
+.toggleActive span {
+  transform: translateX(22px);
+}
+
+.checkboxStack {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+  justify-items: center;
+}
+
+.checkboxLabel {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.numberStepper {
+  display: grid;
+  align-items: center;
+  width: 100%;
+  height: 40px;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  overflow: hidden;
+}
+
+.numberStepper {
+  grid-template-columns: 32px minmax(0, 1fr) 32px;
+}
+
+.numberStepper button {
+  display: grid;
+  width: 32px;
+  height: 100%;
+  color: var(--color-primary);
+  cursor: pointer;
+  border: 0;
+  place-items: center;
+}
+
+.numberStepper button:first-child {
+  border-right: 1px solid var(--color-border);
+}
+
+.numberStepper button:last-child {
+  border-left: 1px solid var(--color-border);
+}
+
+.numberStepper button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.numberStepper label {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  height: 100%;
+  min-width: 0;
+  padding: 0 8px;
+}
+
+.numberStepper input {
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  text-align: center;
+  color: var(--color-text);
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+
+.numberStepper input::-webkit-outer-spin-button,
+.numberStepper input::-webkit-inner-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.numberStepper input[type="number"] {
+  appearance: textfield;
+}
+
+.numberStepper span {
+  color: var(--color-muted);
+  font-weight: 650;
+}
+
+.settingsLayout .formActions {
+  align-self: end;
+}
+
+@container (max-width: 540px) {
+  .settingsAnalysisRow {
+    --settings-control-column: clamp(132px, 31cqi, 164px);
+    --settings-inner-control: clamp(118px, 27cqi, 138px);
+    --settings-text-column: minmax(0, clamp(200px, 52cqi, 320px));
+
+    grid-template-columns: var(--settings-text-column) var(--settings-control-column);
+    column-gap: clamp(8px, 2.4cqi, 14px);
+  }
+
+  .toggle {
+    width: 44px;
+    height: 25px;
+    padding: 3px;
+  }
+
+  .toggle span {
+    width: 19px;
+    height: 19px;
+  }
+
+  .toggleActive span {
+    transform: translateX(19px);
+  }
+
+  .numberStepper {
+    height: 38px;
+    grid-template-columns: 30px minmax(0, 1fr) 30px;
+  }
+
+  .numberStepper button {
+    width: 30px;
+  }
+
+  .checkboxLabel {
+    font-size: 13px;
+  }
+}
+
+@container (max-width: 430px) {
+  .settingsAnalysisRow {
+    --settings-control-column: clamp(112px, 30cqi, 132px);
+    --settings-inner-control: clamp(104px, 27cqi, 120px);
+    --settings-text-column: minmax(0, clamp(176px, 52cqi, 260px));
+
+    grid-template-columns: var(--settings-text-column) var(--settings-control-column);
+    column-gap: clamp(6px, 2cqi, 10px);
+  }
+}
+
+.placeholder {
+  max-width: 680px;
+  margin-top: 64px;
+  margin-inline: auto;
+}
+
+.placeholder span {
+  display: grid;
+  width: 64px;
+  height: 64px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border-radius: 50%;
+  place-items: center;
+}
+
+.placeholder strong {
+  color: var(--color-primary);
+  font-size: 20px;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  padding: 24px;
+  background: rgb(15 23 42 / 38%);
+  place-items: center;
+}
+
+.modal {
+  display: grid;
+  gap: 16px;
+  width: min(760px, 100%);
+  max-height: calc(100dvh - 48px);
+  overflow: hidden;
+  padding: 22px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+
+.modalHeader,
+.modalActions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.modalHeader h2 {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  color: var(--color-text);
+}
+
+.modalHeader h2 svg {
+  color: var(--color-primary);
+}
+
+.modalHeader button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  place-items: center;
+}
+
+.modal label {
+  display: grid;
+  gap: 8px;
+  font-weight: 750;
+}
+
+.modal input,
+.modal textarea {
+  width: 100%;
+  padding: 12px;
+}
+
+.modal textarea {
+  min-height: clamp(220px, 42dvh, 360px);
+  max-height: clamp(220px, 42dvh, 360px);
+  resize: none;
+  overflow-y: auto;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.toast {
+  position: fixed;
+  top: 22px;
+  left: 50%;
+  z-index: 40;
+  max-width: 520px;
+  padding: 12px 16px;
+  color: #fff;
+  background: #111827;
+  border-radius: var(--radius-control);
+  transform: translateX(-50%);
+}
+
+.loadingScreen {
+  display: grid;
+  gap: 16px;
+  min-height: 100vh;
+  place-content: center;
+  place-items: center;
+  background: var(--color-bg);
+}
+
+.loadingScreen .logoMark {
+  --logo-size: 34px;
+}
+

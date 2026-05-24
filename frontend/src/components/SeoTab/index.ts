@@ -1,1 +1,0 @@
-export { SeoTab } from './SeoTab'

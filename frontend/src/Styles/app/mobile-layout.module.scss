@@ -1,0 +1,1332 @@
+/* Mobile layout responsive rules and targeted component fixes. Cascade layer; keep import order in src/App/Styles.module.scss. */
+/* Mobile polish pass: compact navigation, modal charts, document cards, and dense SaaS controls. */
+@media (max-width: 760px) {
+  .sidebar {
+    display: grid;
+    grid-template-rows: auto auto;
+    gap: 8px;
+    align-items: stretch;
+    padding: 10px 12px;
+  }
+
+  .brand {
+    display: flex;
+    gap: 9px;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .brand .logoMark,
+  .sidebar .logoMark {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+  }
+
+  .brandText {
+    width: auto;
+    min-width: 0;
+    height: auto;
+    gap: 1px;
+  }
+
+  .brandName {
+    overflow: hidden;
+    font-size: 18px;
+    line-height: 1.05;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .brandSubtitle {
+    overflow: hidden;
+    max-width: 180px;
+    font-size: 11px;
+    line-height: 1.1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .nav {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .navButton {
+    min-height: 40px;
+    border-left: 0;
+    border-bottom: 3px solid transparent;
+  }
+
+  .navButtonActive {
+    border-bottom-color: var(--color-primary);
+  }
+
+  .content {
+    --content-inline-space: 14px;
+    --content-block-start: 14px;
+  }
+
+  .pageTitle {
+    gap: 6px;
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+
+  .pageTitle h1,
+  .welcomeHero h1 {
+    max-width: 100%;
+    font-size: clamp(24px, 7vw, 28px);
+    line-height: 1.12;
+  }
+
+  .pageTitle p,
+  .welcomeHero p {
+    max-width: 100%;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .card,
+  .seoResultCard,
+  .seoInsightsStack > .seoResultCard,
+  .settingsPanel {
+    padding: 14px;
+  }
+
+  .warningBanner {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr);
+    gap: 8px 10px;
+    align-items: start;
+    padding: 14px;
+  }
+
+  .warningBanner svg {
+    margin-top: 1px;
+  }
+
+  .warningBanner button {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 42px;
+    margin-left: 0;
+  }
+
+  .warningBanner b,
+  .warningBanner p {
+    font-size: 0;
+    line-height: 0;
+  }
+
+  .warningBanner b::after {
+    content: "Результат устарел";
+    color: #8a5200;
+    font-size: 14px;
+    font-weight: 750;
+    line-height: 1.2;
+  }
+
+  .warningBanner p::after {
+    content: "Документы или параметры изменились.";
+    color: #8a5200;
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .seoDocumentControlCard {
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .seoDocumentPickList {
+    height: auto;
+    max-height: clamp(260px, 42dvh, 420px);
+  }
+
+  .seoDocumentActions {
+    gap: 12px 8px;
+  }
+
+  .seoDocumentBulkActions .secondaryButton,
+  .seoAnalyzeButton {
+    height: 44px;
+    min-height: 44px;
+  }
+
+  .seoPickRow {
+    grid-template-columns: 18px 30px minmax(0, 1fr) 16px;
+    gap: 8px;
+    height: clamp(56px, 13vw, 64px);
+    padding: 8px 9px;
+  }
+
+  .seoPickRow > svg {
+    display: block;
+    width: 16px;
+    height: 16px;
+  }
+
+  .seoSummaryGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .seoMetricCard {
+    grid-template-columns: 32px minmax(0, 1fr);
+    min-height: 58px;
+    justify-content: stretch;
+  }
+
+  .textPreviewCard {
+    gap: 10px;
+  }
+
+  .textPreviewContentLabel {
+    display: none;
+  }
+
+  .textPreviewScroll {
+    height: clamp(260px, 42dvh, 420px);
+    max-height: clamp(260px, 42dvh, 420px);
+    overflow: hidden;
+  }
+
+  .textPreviewScroll .customScrollViewport {
+    overflow-y: auto;
+  }
+
+  .highlightControls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .highlightToggle {
+    min-height: 34px;
+    padding-inline: 8px;
+  }
+
+  .mixedCompactScroll {
+    max-height: clamp(220px, 38dvh, 360px);
+  }
+
+  .mixedCompactHeader {
+    display: none;
+  }
+
+  .mixedCompactRow {
+    position: relative;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "fragment count"
+      "problem problem";
+    gap: 8px 10px;
+    padding: 11px;
+  }
+
+  .mixedCompactRow b {
+    grid-area: fragment;
+    overflow-wrap: anywhere;
+  }
+
+  .mixedCompactRow span {
+    grid-area: problem;
+    color: var(--color-muted);
+    overflow-wrap: anywhere;
+  }
+
+  .mixedCompactRow strong {
+    grid-area: count;
+    justify-self: end;
+    align-self: start;
+    padding: 3px 7px;
+    color: var(--color-danger);
+    font-size: 12px;
+    background: #ffecec;
+    border-radius: 999px;
+  }
+
+  .mixedCompactRow strong::after {
+    content: " вх.";
+  }
+
+  .mixedCompactRow b::before,
+  .mixedCompactRow span::before,
+  .mixedCompactRow strong::before {
+    content: none;
+  }
+
+  .waterSpamCompact {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    align-items: start;
+    min-height: 0;
+  }
+
+  .waterSpamGauge {
+    gap: 7px;
+  }
+
+  .waterSpamGauge .coverageDonut,
+  .coverageDonut {
+    width: 88px;
+    height: 88px;
+  }
+
+  .waterSpamGauge h3 {
+    font-size: 0;
+    line-height: 0;
+  }
+
+  .waterSpamGauge:first-child h3::after {
+    content: "Водность";
+    color: var(--color-muted);
+    font-size: 12px;
+    line-height: 1.2;
+  }
+
+  .waterSpamGauge:nth-child(2) h3::after {
+    content: "Переспам";
+    color: var(--color-muted);
+    font-size: 12px;
+    line-height: 1.2;
+  }
+
+  .documentsToolbarMain {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .documentsToolbarMain > button,
+  .searchField {
+    grid-column: auto;
+    width: 100%;
+    min-height: 42px;
+    margin-left: 0;
+  }
+
+  .documentsListCard {
+    padding: 0;
+  }
+
+  .documentsTableWrap {
+    max-height: clamp(360px, 58dvh, 620px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .documentsTableWrap table,
+  .documentsTableWrap colgroup,
+  .documentsTableWrap thead,
+  .documentsTableWrap tbody,
+  .documentsTableWrap tr,
+  .documentsTableWrap td {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .documentsTableWrap colgroup,
+  .documentsTableWrap thead {
+    display: none;
+  }
+
+  .documentsTableWrap tbody {
+    display: grid;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .documentsTableWrap tbody tr {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 6px 10px;
+    height: auto !important;
+    min-height: 0;
+    padding: 12px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control);
+  }
+
+  .documentsTableWrap tbody td {
+    height: auto !important;
+    padding: 0;
+    border-bottom: 0;
+    text-align: left;
+    white-space: normal;
+  }
+
+  .documentsTableWrap tbody td:first-child {
+    grid-column: 1;
+    grid-row: 1;
+    padding: 3px 0 0;
+  }
+
+  .documentsTableWrap tbody td:nth-child(2) {
+    grid-column: 2;
+    grid-row: 1;
+    padding: 0;
+  }
+
+  .documentsTableWrap tbody td:nth-child(3),
+  .documentsTableWrap tbody td:nth-child(4),
+  .documentsTableWrap tbody td:nth-child(5) {
+    display: inline-flex;
+    grid-column: 2;
+    gap: 5px;
+    align-items: center;
+    min-width: 0;
+    color: var(--color-muted);
+    font-size: 12px;
+  }
+
+  .documentsTableWrap tbody td:nth-child(3)::before {
+    content: "Символов:";
+    font-weight: 650;
+  }
+
+  .documentsTableWrap tbody td:nth-child(4)::before {
+    content: "Слов:";
+    font-weight: 650;
+  }
+
+  .documentsTableWrap tbody td:nth-child(5)::before {
+    content: "Обновлено:";
+    font-weight: 650;
+  }
+
+  .documentsTableWrap tbody td:nth-child(6) {
+    grid-column: 1 / -1;
+    padding-top: 6px;
+  }
+
+  .documentNameCell {
+    max-width: 100%;
+    gap: 9px;
+  }
+
+  .documentIconBadge {
+    width: 34px;
+    height: 34px;
+  }
+
+  .documentNameCell b,
+  .documentNameCell small {
+    max-width: 100%;
+  }
+
+  .rowActions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+    justify-content: stretch;
+  }
+
+  .rowActions button {
+    width: 100%;
+    height: 38px;
+  }
+
+  .rowActions button:last-child {
+    grid-column: auto;
+    justify-self: stretch;
+  }
+
+  .documentsFooter {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    min-height: 0;
+    padding: 10px 12px 12px;
+  }
+
+  .documentsFooter .massActions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+
+  .documentsFooter .massActions > span {
+    width: 100%;
+    min-width: 0;
+    padding-left: 0;
+  }
+
+  .documentsFooter .massActions > .secondaryButton {
+    width: 100%;
+    min-height: 42px;
+    margin-left: 0;
+  }
+
+  .paginationControls {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .settingsAnalysisContent {
+    grid-template-rows: none;
+    gap: 0;
+  }
+
+  .settingsAnalysisRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: center;
+    padding-block: 12px;
+  }
+
+  .settingsAnalysisRow:nth-child(2),
+  .settingsAnalysisRow:nth-child(3) {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .settingsAnalysisText p {
+    display: none;
+  }
+
+  .settingsControlCell {
+    justify-items: end;
+  }
+
+  .settingsAnalysisRow:nth-child(2) .settingsControlCell,
+  .settingsAnalysisRow:nth-child(3) .settingsControlCell {
+    justify-items: stretch;
+  }
+
+  .settingsSeoSpamControl,
+  .settingsNgramControl {
+    width: 100%;
+  }
+
+  .settingsSeoSpamControl small {
+    display: none;
+  }
+
+  .checkboxStack {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-items: start;
+  }
+
+  .settingsLayout .formActions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .settingsLayout .formActions button {
+    width: 100%;
+    min-height: 42px;
+  }
+
+  .detailOverlay {
+    padding: 12px;
+    overflow: hidden;
+  }
+
+  .detailModal {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: calc(100vw - 24px);
+    height: calc(100dvh - 24px);
+    max-height: calc(100dvh - 24px);
+    padding: 12px;
+    overflow: hidden;
+  }
+
+  .detailHeader {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 38px;
+    gap: 10px;
+    align-items: start;
+  }
+
+  .detailHeader h2 {
+    overflow: hidden;
+    font-size: 18px;
+    line-height: 1.18;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .detailHeader p {
+    margin-top: 3px;
+    font-size: 12px;
+    line-height: 1.25;
+  }
+
+  .detailHeader button {
+    width: 38px;
+    height: 38px;
+  }
+
+  .detailToolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    align-items: stretch;
+    padding: 8px;
+  }
+
+  .detailFilters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    align-items: end;
+    width: 100%;
+  }
+
+  .detailControlGroup {
+    grid-column: 1 / -1;
+  }
+
+  .detailControlGroup,
+  .detailNumberControl {
+    min-width: 0;
+    gap: 4px;
+    font-size: 11px;
+  }
+
+  .detailNumberControl input,
+  .detailAllButton,
+  .detailAllButtonActive,
+  .detailDropdownButton {
+    width: 100%;
+    min-width: 0;
+    height: 40px;
+    min-height: 40px;
+  }
+
+  .detailDropdown {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .detailActionBar {
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+
+  .detailActionBar .chartActionButton {
+    width: 38px;
+    min-width: 38px;
+    height: 38px;
+    min-height: 38px;
+    padding-inline: 0;
+  }
+
+  .detailActionBar .chartActionButton span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .detailChart {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    overflow: hidden;
+  }
+
+  .detailChart .customScrollViewport {
+    height: 100%;
+    padding: 10px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .detailChartRows {
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .detailChartRow,
+  .detailChartRowKeywords {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "label count"
+      "bar density"
+      "status status";
+    gap: 6px 10px;
+    min-height: 48px;
+    padding: 9px 10px;
+    align-items: center;
+  }
+
+  .detailChartRow > span {
+    grid-area: label;
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  .detailChartBar {
+    grid-area: bar;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .detailChartRow b {
+    grid-area: count;
+    justify-self: end;
+  }
+
+  .detailChartRow small {
+    grid-area: density;
+    justify-self: end;
+  }
+
+  .detailChartRow em {
+    grid-area: status;
+    justify-self: start;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 430px) {
+  .brandSubtitle {
+    max-width: 142px;
+  }
+
+  .detailHeader p {
+    display: none;
+  }
+
+  .seoDocumentBulkActions .secondaryButton,
+  .seoAnalyzeButton {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 375px) {
+  .content {
+    --content-inline-space: 12px;
+    --content-block-start: 12px;
+  }
+
+  .brandSubtitle {
+    display: none;
+  }
+
+  .seoMetricCard {
+    min-height: 54px;
+  }
+}
+
+@media (max-width: 340px) {
+  .waterSpamCompact {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .waterSpamGauge .coverageDonut,
+  .coverageDonut {
+    width: 84px;
+    height: 84px;
+  }
+
+  .checkboxStack {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .detailFilters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .detailControlGroup {
+    grid-column: auto;
+  }
+}
+
+/* Targeted mobile fixes for remaining blocks. Desktop rules above stay untouched. */
+@media (max-width: 760px) {
+  .detailModal {
+    display: flex;
+    flex-direction: column;
+    width: calc(100vw - 24px);
+    height: calc(100dvh - 24px);
+    max-height: calc(100dvh - 24px);
+    overflow: hidden;
+  }
+
+  .detailHeader,
+  .detailToolbar {
+    flex: 0 0 auto;
+  }
+
+  .detailHeader h2 {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .detailHeader h2 svg {
+    flex: 0 0 auto;
+    color: var(--color-primary);
+  }
+
+  .detailHeader h2 span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .detailChart {
+    display: grid;
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    overflow: hidden;
+  }
+
+  .detailChart .customScrollViewport {
+    height: 100%;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+
+  .detailChart .customScrollViewport::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  .detailChartRows {
+    min-width: 0;
+  }
+
+  .detailChartRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "label count"
+      "bar density";
+    min-height: 46px;
+  }
+
+  .detailChartRowKeywords {
+    grid-template-areas:
+      "label count"
+      "bar density"
+      "status status";
+  }
+
+  .detailChartRow > span,
+  .detailChartRow b,
+  .detailChartRow small,
+  .detailChartRow em {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .seoDocumentPickList {
+    background-clip: padding-box;
+    isolation: isolate;
+  }
+
+  .seoPickRow {
+    overflow: hidden;
+    background-clip: padding-box;
+  }
+
+  .seoPickRow input {
+    appearance: none;
+    -webkit-appearance: none;
+    margin: 0;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+  }
+
+  .seoPickRowSelected {
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-primary) 18%, transparent);
+  }
+
+  .keywordCoverageGrid .keywordMiniScroll {
+    order: 1;
+  }
+
+  .keywordCoverageGrid .keywordCoverageGauge {
+    order: 2;
+  }
+
+  .keywordCoverageGrid {
+    gap: 12px;
+  }
+
+  .keywordMiniScroll {
+    height: auto;
+    max-height: clamp(190px, 30dvh, 280px);
+  }
+
+  .keywordMiniList {
+    min-height: 0;
+  }
+
+  .keywordMiniRow {
+    min-height: 36px;
+  }
+
+  .keywordMiniRow span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .keywordCoverageGauge {
+    gap: 6px;
+    padding-top: 2px;
+  }
+
+  .keywordCoverageGauge .coverageDonut {
+    width: 82px;
+    height: 82px;
+  }
+
+  .seoResultFooterActions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 6px;
+  }
+
+  .structureMetrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .structureMetric {
+    min-height: 92px;
+    height: 100%;
+    align-content: space-between;
+    padding: 12px;
+  }
+
+  .structureMetric span {
+    display: block;
+    min-height: 2.45em;
+    max-width: 14ch;
+    font-size: 12px;
+    line-height: 1.18;
+    text-wrap: balance;
+  }
+
+  .structureMetric b {
+    margin-top: 8px;
+    font-size: 16px;
+    line-height: 1.15;
+  }
+
+  .mixedCompactScroll {
+    max-height: clamp(240px, 40dvh, 380px);
+    padding: 6px;
+    overflow: hidden;
+    background: var(--color-surface-soft);
+  }
+
+  .mixedCompactScroll .customScrollViewport {
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-right: 8px;
+  }
+
+  .mixedCompactList {
+    gap: 8px;
+  }
+
+  .mixedCompactHeader {
+    display: none;
+  }
+
+  .mixedCompactRow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "fragment count"
+      "suggestion suggestion";
+    gap: 7px 10px;
+    min-height: 0;
+    padding: 12px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+  }
+
+  .mixedCompactRow b {
+    grid-area: fragment;
+    min-width: 0;
+    color: var(--color-text);
+    font-size: 14px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .mixedCompactRow b .highlightTagMixed {
+    color: var(--color-danger);
+    background: transparent;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-danger) 34%, transparent);
+    border-radius: 0;
+  }
+
+  .mixedCompactRow span {
+    grid-area: suggestion;
+    min-width: 0;
+    color: var(--color-muted);
+    font-size: 12px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .mixedCompactRow strong {
+    grid-area: count;
+    align-self: start;
+    justify-self: end;
+    min-width: max-content;
+    padding: 3px 8px;
+    color: var(--color-danger);
+    font-size: 12px;
+    line-height: 1.15;
+    text-align: center;
+    background: color-mix(in srgb, var(--color-danger) 10%, var(--color-surface));
+    border: 1px solid color-mix(in srgb, var(--color-danger) 18%, var(--color-border));
+    border-radius: 999px;
+  }
+
+  .mixedCompactRow strong::after {
+    content: " вх.";
+  }
+
+  .mixedCompactRow b::before,
+  .mixedCompactRow span::before,
+  .mixedCompactRow strong::before {
+    content: none;
+  }
+
+  .textPreviewEmptySlot .emptyPlaceholder {
+    min-height: 74px;
+  }
+
+  .settingsAnalysisContent {
+    gap: 10px;
+  }
+
+  .settingsAnalysisRow,
+  .settingsAnalysisRow:nth-child(2),
+  .settingsAnalysisRow:nth-child(3) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 9px;
+    align-items: stretch;
+    padding: 12px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+  }
+
+  .settingsAnalysisRow:first-child {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .settingsAnalysisRow:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .settingsAnalysisText,
+  .settingLabel,
+  .settingLabel > span {
+    min-width: 0;
+  }
+
+  .settingLabel > span {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .settingLabel b {
+    font-size: 14px;
+  }
+
+  .settingsControlCell {
+    justify-items: stretch;
+  }
+
+  .settingsAnalysisRow:first-child .settingsControlCell {
+    justify-items: end;
+  }
+
+  .settingsSeoSpamControl small {
+    display: block;
+    margin-top: 5px;
+    color: var(--color-muted);
+    font-size: 11px;
+    line-height: 1.2;
+    text-align: left;
+    white-space: normal;
+  }
+
+  .numberStepper {
+    height: 42px;
+  }
+
+  .checkboxStack {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    justify-items: stretch;
+  }
+
+  .checkboxLabel {
+    min-height: 38px;
+    justify-content: flex-start;
+    padding: 0 10px;
+    background: var(--color-surface-soft);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+  }
+
+  .documentsPage,
+  .documentsLoadedGrid,
+  .documentsListCard {
+    height: auto;
+    overflow: visible;
+  }
+
+  .documentsTableWrap {
+    max-height: none;
+    overflow: visible;
+    flex: 0 0 auto;
+  }
+
+  .documentsTableWrap tbody {
+    padding: 10px;
+  }
+
+  .documentsTableWrap tbody tr {
+    min-height: 0;
+  }
+
+  .corpusSummaryCard {
+    display: grid;
+    grid-template-rows: none;
+    gap: 10px;
+    height: auto;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .corpusSummaryTitle {
+    display: none;
+  }
+
+  .corpusSummaryCard > .corpusSummaryStat:nth-child(2),
+  .corpusSummaryCard > .corpusSummaryStat:nth-child(3),
+  .corpusSummaryCard > .corpusSummaryStat:nth-child(4) {
+    grid-row: auto;
+  }
+
+  .corpusSummaryStat {
+    grid-template-columns: 42px minmax(0, 1fr);
+    justify-self: stretch;
+    width: 100%;
+    min-height: 72px;
+    height: auto;
+    padding: 12px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+  }
+
+  .summaryIconBubble {
+    width: 42px;
+    height: 42px;
+  }
+
+  .summaryIconCenter svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .corpusSummaryStat b {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 340px) {
+  .structureMetrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .checkboxStack {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@keyframes appToastFloat {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(5px);
+  }
+
+  18%,
+  68% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-5px);
+  }
+}
+
+.toast {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  animation: appToastFloat 900ms ease-in-out forwards;
+}
+
+.copyFeedback {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+}
+
+.copyFeedback svg {
+  flex: 0 0 auto;
+  color: currentColor;
+}
+
+.detailCopyNotice.copyFeedback {
+  display: inline-flex;
+  animation: copyNoticeFloat 900ms ease-in-out forwards;
+}
+
+.detailHeader h2 {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.detailHeader h2 svg {
+  flex: 0 0 auto;
+  color: var(--color-primary);
+}
+
+.detailHeader h2 span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mixedCompactRow {
+  grid-template-columns: minmax(140px, 0.85fr) minmax(180px, 1fr) 74px;
+}
+
+.mixedFragmentCell,
+.mixedSuggestionCell {
+  min-width: 0;
+}
+
+.mixedFragmentCell {
+  overflow-wrap: anywhere;
+}
+
+.mixedFragmentCell span,
+.mixedFragmentText {
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.mixedFragmentCell .highlightTagMixed {
+  color: var(--color-danger);
+  background: transparent;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-danger) 36%, transparent);
+  border-radius: 0;
+}
+
+.mixedSuggestionCell {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  overflow: hidden;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.mixedSuggestionCell span {
+  flex: 0 0 auto;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.mixedSuggestionCell b {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mixedCountBadge {
+  justify-self: end;
+  min-width: max-content;
+  padding: 3px 8px;
+  color: var(--color-danger);
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.15;
+  background: color-mix(in srgb, var(--color-danger) 10%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-danger) 18%, var(--color-border));
+  border-radius: 999px;
+}
+
+.mixedCountShort {
+  display: none;
+}
+
+.structureMetricLabel {
+  display: grid;
+  gap: 1px;
+  min-height: 2.45em;
+}
+
+.structureMetricLabel > span {
+  min-height: 0;
+  max-width: none;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+}
+
+.modalOverlay,
+.detailOverlay {
+  overscroll-behavior: contain;
+  touch-action: none;
+}
+

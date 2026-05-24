@@ -1,0 +1,1 @@
+export { CompareAnalysisPage } from './CompareAnalysisPage'

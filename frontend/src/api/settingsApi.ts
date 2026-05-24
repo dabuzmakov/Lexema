@@ -1,5 +1,5 @@
 import { createQuery, requestJson, USE_MOCK_API } from './http'
-import type { AnalysisSettings } from '../types/settings'
+import type { AnalysisSettings } from '../Models/settings'
 
 export async function getSettings(browserId: string) {
   if (USE_MOCK_API) {
