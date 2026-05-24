@@ -9,10 +9,10 @@ services:
     name: text-analyzer-backend
     runtime: python
     rootDir: backend
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt && python scripts/check_spelling_engine.py --runtime-only
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     autoDeployTrigger: checksPass
-    healthCheckPath: /docs
+    healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -20,6 +20,26 @@ services:
           property: connectionString
       - key: CORS_ALLOW_ORIGINS
         sync: false
+      - key: DB_POOL_MIN_SIZE
+        value: "1"
+      - key: DB_POOL_MAX_SIZE
+        value: "8"
+      - key: SEO_ANALYSIS_CONCURRENCY
+        value: "2"
+      - key: COMPARE_ANALYSIS_CONCURRENCY
+        value: "1"
+      - key: SPELLING_ANALYSIS_CONCURRENCY
+        value: "1"
+      - key: MAX_DOCUMENTS_PER_CLIENT
+        value: "30"
+      - key: MAX_DOCUMENT_CHARS
+        value: "150000"
+      - key: MAX_TOTAL_CHARS_PER_SEO_ANALYSIS
+        value: "300000"
+      - key: MAX_TOTAL_CHARS_PER_SPELLING_ANALYSIS
+        value: "100000"
+      - key: MAX_DOCUMENT_CHARS_PER_COMPARE
+        value: "150000"
   - type: web
     name: text-analyzer-frontend
     runtime: static
