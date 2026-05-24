@@ -1,5 +1,5 @@
 import { createQuery, requestJson, USE_MOCK_API } from './http'
-import type { AppStatePayload } from '../types/api'
+import type { AppStatePayload } from '../Models/api'
 
 export async function getAppState(browserId: string) {
   if (USE_MOCK_API) {

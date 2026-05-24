@@ -1,5 +1,5 @@
 import { createQuery, downloadBlob, downloadResponseBlob, requestBlob, USE_MOCK_API } from './http'
-import type { SeoTableExportType } from '../types/analysis'
+import type { CompareTableExportType, SeoTableExportType } from '../Models/analysis'
 
 const csvNames: Record<SeoTableExportType, string> = {
   words: 'seo_words.csv',
@@ -8,6 +8,12 @@ const csvNames: Record<SeoTableExportType, string> = {
   spam: 'seo_spam.csv',
   water: 'seo_water.csv',
   mixed: 'seo_mixed.csv',
+}
+
+const compareCsvNames: Record<CompareTableExportType, string> = {
+  words: 'compare_words.csv',
+  ngrams: 'compare_ngrams.csv',
+  keywords: 'compare_keywords.csv',
 }
 
 export async function downloadSeoCsv(type: SeoTableExportType, browserId: string) {
@@ -22,6 +28,20 @@ export async function downloadSeoCsv(type: SeoTableExportType, browserId: string
     `/export/csv/seo/${type}${createQuery({ browser_id: browserId })}`,
   )
   await downloadResponseBlob(response, csvNames[type])
+}
+
+export async function downloadCompareCsv(type: CompareTableExportType, browserId: string) {
+  if (USE_MOCK_API) {
+    const { downloadMockCompareCsv } = await import('./mockApi')
+    const blob = await downloadMockCompareCsv(browserId, type)
+    downloadBlob(blob, compareCsvNames[type])
+    return
+  }
+
+  const response = await requestBlob(
+    `/export/csv/compare/${type}${createQuery({ browser_id: browserId })}`,
+  )
+  await downloadResponseBlob(response, compareCsvNames[type])
 }
 
 export async function downloadSeoZip(browserId: string) {

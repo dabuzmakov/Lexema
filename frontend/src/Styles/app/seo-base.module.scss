@@ -1,0 +1,423 @@
+/* SEO base sections and report blocks. Cascade layer; keep import order in src/App/Styles.module.scss. */
+.seoPage {
+  --seo-page-offset: calc(var(--content-block-start) + var(--content-inline-space));
+
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  gap: clamp(16px, 1.6vh, 22px);
+  height: auto;
+  min-height: 0;
+  width: 100%;
+}
+
+.seoPage .pageTitle {
+  margin-top: clamp(18px, 2.1vw, 30px);
+  margin-bottom: 0;
+}
+
+.card {
+  padding: 22px;
+  border-radius: var(--radius-card);
+}
+
+.cardHeader {
+  margin-bottom: 14px;
+}
+
+.toolbarInline,
+.tableControls,
+.formActions,
+.sectionActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.documentPickList {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.pickRow {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-height: 54px;
+  padding: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.pickRow svg {
+  color: var(--color-primary);
+}
+
+.pickRow span {
+  display: grid;
+}
+
+.pickRow small {
+  color: var(--color-muted);
+}
+
+.settingsList {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.emptyReport,
+.placeholder,
+.emptyListState {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  padding: 62px 24px;
+  color: var(--color-muted);
+  text-align: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+
+.emptyReport svg,
+.placeholder svg,
+.emptyListState svg {
+  color: var(--color-primary);
+}
+
+.emptyReport h2,
+.placeholder h1,
+.emptyListState b {
+  color: var(--color-text);
+}
+
+.lockedList {
+  display: grid;
+  gap: 10px;
+}
+
+.lockedRow {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-height: 58px;
+  padding: 0 16px;
+  color: var(--color-muted);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  opacity: 0.68;
+}
+
+.warningBanner {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  color: #8a5200;
+  background: #fff8e7;
+  border: 1px solid #f5c872;
+  border-radius: var(--radius-card);
+}
+
+.warningBanner > div {
+  min-width: 0;
+}
+
+.warningBanner button {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.warningBanner p {
+  margin-top: 2px;
+}
+
+.reportActions {
+  padding: 14px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+
+.reportActions > div {
+  display: flex;
+  gap: 10px;
+}
+
+.summaryGrid {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.metricCard {
+  display: grid;
+  gap: 8px;
+  min-height: 90px;
+  padding: 16px;
+  border-radius: var(--radius-card);
+}
+
+.metricCard span {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.metricCard b {
+  font-size: 24px;
+}
+
+.metric_success {
+  color: var(--color-primary);
+}
+
+.metric_warning {
+  color: #d97706;
+}
+
+.metric_danger {
+  color: var(--color-danger);
+}
+
+.tableControls {
+  margin: 12px 0 16px;
+}
+
+.tableControls label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+.tableControls input,
+.tableControls select,
+.searchField input,
+.formGrid input,
+.formGrid textarea,
+.settingsPanel textarea,
+.modal input,
+.modal textarea {
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+}
+
+.formGrid input:focus,
+.formGrid textarea:focus,
+.settingsPanel textarea:focus,
+.modal input:focus,
+.modal textarea:focus {
+  outline: 0;
+}
+
+.tableControls input,
+.tableControls select {
+  width: 132px;
+  height: 38px;
+  padding: 0 10px;
+}
+
+.tableChartGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.85fr);
+  gap: 20px;
+}
+
+.tableWrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+}
+
+table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 13px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+th {
+  color: var(--color-muted);
+  font-size: 13px;
+  font-weight: 800;
+  background: var(--color-surface-soft);
+}
+
+td {
+  vertical-align: middle;
+}
+
+tr:last-child td {
+  border-bottom: 0;
+}
+
+.barChart {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  padding: 4px 0;
+}
+
+.barRow {
+  display: grid;
+  grid-template-columns: 90px minmax(120px, 1fr) 38px;
+  gap: 10px;
+  align-items: center;
+  font-size: 13px;
+}
+
+.barRow > span {
+  overflow: hidden;
+  color: var(--color-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.barRow div {
+  height: 12px;
+  overflow: hidden;
+  background: var(--color-track);
+  border-radius: 999px;
+}
+
+.barRow i {
+  display: block;
+  height: 100%;
+  background: #4b8fe8;
+  border-radius: inherit;
+}
+
+.badge {
+  display: inline-flex;
+  min-width: 84px;
+  justify-content: center;
+  padding: 4px 9px;
+  font-size: 12px;
+  font-weight: 800;
+  border-radius: 999px;
+  background: var(--color-surface-soft);
+}
+
+.badge_missing,
+.badge_spam {
+  color: var(--color-danger);
+  background: #ffecec;
+}
+
+.badge_low,
+.badge_high {
+  color: #b45309;
+  background: #fff4dc;
+}
+
+.badge_normal {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.waterSpamGrid {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
+  gap: 18px;
+}
+
+.gaugeBlock,
+.spamBlock {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+}
+
+.donut {
+  display: grid;
+  width: 120px;
+  height: 120px;
+  margin-inline: auto;
+  background: var(--color-surface-soft);
+  border: 10px solid var(--color-primary);
+  border-radius: 50%;
+  place-items: center;
+}
+
+.donut span {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.progressTrackLarge {
+  height: 12px;
+}
+
+.warningList {
+  display: grid;
+  gap: 8px;
+}
+
+.warningList p {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--color-muted);
+}
+
+.mixedList {
+  display: grid;
+  gap: 10px;
+}
+
+.mixedList div {
+  display: grid;
+  grid-template-columns: minmax(100px, 0.7fr) 90px minmax(200px, 1fr);
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.mixedList small,
+.mixedList span {
+  color: var(--color-muted);
+}
+
+.recommendationGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.recommendationCard {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.recommendationCard svg {
+  flex: 0 0 auto;
+  color: var(--color-primary);
+}
+

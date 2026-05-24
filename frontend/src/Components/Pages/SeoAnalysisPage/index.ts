@@ -1,0 +1,1 @@
+export { SeoAnalysisPage } from './SeoAnalysisPage'

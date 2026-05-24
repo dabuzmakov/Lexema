@@ -1,0 +1,1652 @@
+.comparePage {
+  min-width: 0;
+}
+
+.comparePageFill {
+  grid-template-rows: auto auto auto auto minmax(0, 1fr);
+  min-height: 0;
+  height: calc(100dvh - var(--content-block-start) - var(--content-inline-space));
+}
+
+.pickerGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px minmax(0, 1fr);
+  gap: 12px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.documentCard,
+.settingsBar,
+.panel,
+.emptyState,
+.summaryCard,
+.insightCard,
+.errorBanner {
+  min-width: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+
+.documentCard,
+.summaryCard {
+  box-shadow: var(--shadow-card);
+}
+
+.documentCard {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+  align-content: stretch;
+  min-height: 132px;
+  padding: 14px;
+}
+
+.documentCardHeader {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.documentCardTitle {
+  display: block;
+  min-width: 0;
+}
+
+.documentCardTitle > span {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.documentCardA .documentCardHeader span,
+.documentCardA .documentBadge {
+  color: var(--color-primary);
+}
+
+.documentCardB .documentCardHeader span,
+.documentCardB .documentBadge {
+  color: #2f80ed;
+}
+
+.documentSelectWrap {
+  position: relative;
+  min-width: 0;
+}
+
+.documentSelectButton {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 18px;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  height: 68px;
+  min-height: 68px;
+  padding: 10px 11px;
+  color: var(--color-text);
+  cursor: pointer;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+}
+
+.documentSelectPlaceholder {
+  grid-column: 1 / 3;
+  color: var(--color-muted);
+  font-weight: 650;
+  text-align: left;
+}
+
+.documentBadge {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  background: var(--color-primary-soft);
+  border-radius: 8px;
+  place-items: center;
+}
+
+.documentSelectText {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  text-align: left;
+}
+
+.documentSelectText b,
+.documentMenuItemActive b,
+.documentMenu button b {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.documentSelectText small,
+.documentMenu small {
+  overflow: hidden;
+  color: var(--color-muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clearDocumentButton {
+  display: grid;
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  color: var(--color-muted);
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  place-items: center;
+}
+
+.documentMenu {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 8px);
+  right: 0;
+  left: 0;
+  display: grid;
+  max-height: 280px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+}
+
+.documentMenu button {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  min-height: 54px;
+  padding: 9px 10px;
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+}
+
+.documentMenuIcon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border-radius: 8px;
+  place-items: center;
+}
+
+.documentMenu button > span:not(.documentMenuIcon) {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.documentMenu button:hover,
+.documentMenuItemActive {
+  background: var(--color-primary-soft);
+}
+
+.documentMenu button:disabled {
+  cursor: not-allowed;
+}
+
+.documentMenu em {
+  color: var(--color-primary);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 750;
+}
+
+.documentMenuDisabledBadge {
+  color: #2f80ed !important;
+}
+
+.documentCardB .documentMenu em {
+  color: #2f80ed;
+}
+
+.documentCardB .documentMenuDisabledBadge {
+  color: var(--color-primary) !important;
+}
+
+.vsDivider {
+  position: relative;
+  display: grid;
+  min-height: 100%;
+  place-items: center;
+}
+
+.vsDivider::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  content: "";
+  background: color-mix(in srgb, var(--color-primary) 55%, transparent);
+}
+
+.vsDivider span {
+  z-index: 1;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  color: var(--color-primary);
+  font-weight: 800;
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 60%, var(--color-border));
+  border-radius: 50%;
+  place-items: center;
+}
+
+.settingsBar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+}
+
+.settingsBarTitle {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--color-text);
+}
+
+.settingsBarTitle svg {
+  color: var(--color-primary);
+}
+
+.settingsChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  min-width: 0;
+}
+
+.settingsChips span,
+.coveragePills span {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  padding: 0 8px;
+  color: var(--color-sidebar-text);
+  font-size: 11px;
+  font-weight: 650;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+}
+
+.actionRow,
+.emptyActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.compareActionButton {
+  height: 42px;
+  min-height: 42px;
+  padding-inline: 16px;
+}
+
+.errorBanner {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 13px 15px;
+  color: #9f1239;
+  background: #fff1f2;
+  border-color: #fecdd3;
+}
+
+.emptyState {
+  display: grid;
+  gap: 8px;
+  align-content: center;
+  justify-items: center;
+  padding: clamp(42px, 8vh, 76px) 24px;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.emptyStateCompact {
+  padding: clamp(28px, 4.5vh, 48px) 24px;
+}
+
+.emptyStateFill {
+  align-self: stretch;
+  justify-self: stretch;
+  width: 100%;
+  min-height: 0;
+  height: 100%;
+}
+
+.emptyState svg {
+  color: var(--color-primary);
+}
+
+.loadingIcon {
+  animation: compareSpin 0.9s linear infinite;
+}
+
+.emptyState h2 {
+  color: var(--color-text);
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+@keyframes compareSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.emptyState p {
+  max-width: 560px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.resultsStack {
+  display: grid;
+  gap: clamp(16px, 1.8vh, 22px);
+  min-width: 0;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.summaryCard {
+  display: grid;
+  gap: 9px;
+  align-items: center;
+  justify-items: center;
+  justify-content: center;
+  min-height: 96px;
+  padding: 14px;
+  text-align: center;
+}
+
+.summaryIcon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  place-items: center;
+}
+
+.summaryCard div {
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  min-width: 0;
+}
+
+.summaryCard span {
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.summaryCard b {
+  color: var(--color-text);
+  font-size: clamp(17px, 1.35vw, 21px);
+  line-height: 1.05;
+}
+
+.summaryCard small {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.tone_positive {
+  color: var(--color-primary);
+}
+
+.tone_negative {
+  color: #e11d48;
+}
+
+.tone_neutral {
+  color: #2f80ed;
+}
+
+.summaryIcon.tone_positive {
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+}
+
+.summaryIcon.tone_negative {
+  background: #fff1f2;
+}
+
+.summaryIcon.tone_neutral {
+  background: color-mix(in srgb, #2f80ed 12%, var(--color-surface));
+}
+
+.panel {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  padding: clamp(14px, 1.2vw, 18px);
+}
+
+.panelHeader {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.panelHeader h2 {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--color-text);
+  font-size: 15px;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.panelHeader svg {
+  color: var(--color-primary);
+}
+
+.metricRows,
+.keywordRows,
+.termRows {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+}
+
+.metricRow {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(74px, auto) minmax(72px, 0.32fr) minmax(74px, auto) minmax(68px, auto);
+  gap: 9px;
+  align-items: center;
+  min-width: 0;
+  min-height: 39px;
+  padding: 8px 2px;
+  background: transparent;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+}
+
+.metricRow:last-child,
+.keywordRow:last-child,
+.termRow:last-child {
+  border-bottom: 0;
+}
+
+.metricName {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.metricPill {
+  justify-self: end;
+  min-width: 68px;
+  padding: 4px 7px;
+  color: var(--color-sidebar-text);
+  font-size: 12px;
+  text-align: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+}
+
+.metricDiffBar {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0;
+  align-items: center;
+  height: 18px;
+  min-width: 72px;
+  background:
+    linear-gradient(to right, transparent calc(50% - 0.5px), var(--color-border) calc(50% - 0.5px), var(--color-border) calc(50% + 0.5px), transparent calc(50% + 0.5px)),
+    linear-gradient(to bottom, transparent calc(50% - 1px), var(--color-track) calc(50% - 1px), var(--color-track) calc(50% + 1px), transparent calc(50% + 1px));
+  border-radius: 999px;
+}
+
+.metricDiffSideA,
+.metricDiffSideB {
+  display: block;
+  height: 6px;
+  min-width: 0;
+  border-radius: 999px;
+}
+
+.metricDiffSideA {
+  justify-self: end;
+  width: var(--metric-a, 0%);
+  background: var(--color-primary);
+}
+
+.metricDiffSideB {
+  justify-self: start;
+  width: var(--metric-b, 0%);
+  background: #2f80ed;
+}
+
+.metricRow em {
+  justify-self: end;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.twoColumnGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.coveragePills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.compareKeywordLayout {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.compareCoverageGauges {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(82px, 1fr));
+  gap: 10px;
+  align-items: start;
+  justify-self: center;
+  width: min(100%, 240px);
+}
+
+.compareKeywordMiniRow {
+  grid-template-columns: minmax(0, 1fr) minmax(52px, auto) minmax(92px, auto) minmax(78px, auto);
+}
+
+.compareKeywordName {
+  min-width: 0;
+}
+
+.compareKeywordValues {
+  display: none;
+  grid-template-columns: repeat(2, minmax(54px, auto));
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+}
+
+.compareKeywordValues span {
+  display: grid;
+  grid-template-columns: auto minmax(16px, auto) minmax(42px, auto);
+  gap: 4px;
+  align-items: center;
+  min-width: 0;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+.compareKeywordValues b {
+  color: var(--color-muted);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.compareKeywordValues strong {
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.compareKeywordValues small {
+  color: var(--color-muted);
+}
+
+.compareKeywordDesktopCount,
+.compareKeywordDesktopDensity {
+  white-space: nowrap;
+}
+
+.compareTermsList {
+  display: grid;
+  gap: 9px;
+  min-width: 0;
+}
+
+.compareTermRow {
+  display: grid;
+  grid-template-columns: minmax(132px, 0.8fr) minmax(210px, 1.3fr) minmax(82px, auto);
+  gap: 14px;
+  align-items: center;
+  min-width: 0;
+  min-height: 58px;
+  padding: 10px 0;
+  font-size: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.compareTermRow:last-child {
+  border-bottom: 0;
+}
+
+.compareTermTitle {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.compareTermTitle b {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text);
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compareTermTitle small {
+  color: var(--color-muted);
+}
+
+.compareTermBars {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.compareTermBars span {
+  position: relative;
+  height: 7px;
+  overflow: hidden;
+  background: var(--color-track);
+  border-radius: 999px;
+}
+
+.compareTermBars i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.compareTermBarA {
+  background: linear-gradient(90deg, var(--color-primary), #15c878);
+}
+
+.compareTermBarB {
+  background: linear-gradient(90deg, #2f80ed, #60a5fa);
+}
+
+.compareTermValues {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3px;
+  justify-content: end;
+  color: var(--color-muted);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.compareTermValues em {
+  color: var(--color-text);
+  font-style: normal;
+  font-weight: 750;
+}
+
+.keywordRow,
+.termRow {
+  display: grid;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  min-height: 38px;
+  padding: 8px 2px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+}
+
+.keywordRow {
+  grid-template-columns: minmax(120px, 1fr) minmax(80px, auto) minmax(80px, auto) minmax(82px, auto);
+}
+
+.termRow {
+  grid-template-columns: minmax(120px, 1fr) auto auto auto auto;
+}
+
+.keywordRow b,
+.termRow b {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.keywordRow span,
+.termRow span,
+.termRow small {
+  color: var(--color-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.keywordRow em,
+.termRow em {
+  justify-self: end;
+  padding: 3px 7px;
+  color: var(--color-primary);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 750;
+  background: var(--color-primary-soft);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.status_missing_in_a,
+.status_lower_in_a {
+  color: #b45309 !important;
+  background: #fff4dc !important;
+}
+
+.status_missing_in_b,
+.status_higher_in_a {
+  color: var(--color-primary) !important;
+  background: var(--color-primary-soft) !important;
+}
+
+.tabs {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.tabs button {
+  min-width: 88px;
+  min-height: 32px;
+  padding: 0 10px;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--color-surface);
+  border: 0;
+  border-right: 1px solid var(--color-border);
+}
+
+.tabs button:last-child {
+  border-right: 0;
+}
+
+.tabs .tabActive {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.blockEmpty {
+  display: grid;
+  min-height: 58px;
+  padding: 12px;
+  color: var(--color-muted);
+  text-align: center;
+  background: transparent;
+  border: 1px dashed var(--color-border);
+  border-radius: 8px;
+  place-items: center;
+}
+
+.similarityGrid {
+  display: grid;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  height: 100%;
+  min-height: 0;
+}
+
+.similarityPanel {
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: stretch;
+}
+
+.similarityItem {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  min-width: 0;
+  min-height: 0;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.similarityItem:last-child {
+  border-bottom: 0;
+}
+
+.similarityDial {
+  position: relative;
+  display: grid;
+  width: 54px;
+  height: 54px;
+  background:
+    radial-gradient(circle at center, var(--color-surface) 57%, transparent 58%),
+    conic-gradient(var(--color-primary) var(--percent), var(--color-track) 0);
+  border-radius: 999px;
+  place-items: center;
+}
+
+.similarityDial::after {
+  position: absolute;
+  inset: 6px;
+  content: "";
+  border: 1px solid var(--color-border);
+  border-radius: inherit;
+}
+
+.similarityDial b {
+  position: relative;
+  z-index: 1;
+  color: var(--color-text);
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.similarityContent {
+  display: grid;
+  grid-template-rows: 18px 8px;
+  align-content: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.similarityItem span {
+  color: var(--color-muted);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.similarityItem i {
+  display: block;
+  height: 8px;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent calc(20% - 1px),
+      rgba(255, 255, 255, 0.95) calc(20% - 1px),
+      rgba(255, 255, 255, 0.95) 20%
+    ),
+    var(--color-track);
+  border-radius: 999px;
+}
+
+.similarityItem em {
+  display: block;
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: inherit;
+}
+
+.compareDetailLegend {
+  display: none;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: center;
+  align-self: center;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.compareDetailToolbar {
+  align-items: center;
+}
+
+.compareDetailFilters {
+  flex: 1 1 auto;
+}
+
+.compareDetailLegend span {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  min-height: 18px;
+  line-height: 18px;
+}
+
+.compareDetailLegend i {
+  display: block;
+  flex: 0 0 auto;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+}
+
+.compareDetailLegendA {
+  background: var(--color-primary);
+}
+
+.compareDetailLegendB {
+  background: #2f80ed;
+}
+
+.compareDetailRows {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+}
+
+.compareDetailChart {
+  --compare-detail-scroll-gutter: 0px;
+}
+
+.compareDetailChart :global([class*="customScrollViewport"]) {
+  padding-top: 0;
+  padding-right: 24px;
+}
+
+.compareDetailChart :global([class*="customScrollTrack"]) {
+  right: 8px;
+}
+
+.compareDetailRow {
+  display: grid;
+  grid-template-areas: "term bars diff";
+  grid-template-columns: minmax(150px, 0.8fr) minmax(240px, 1.3fr) minmax(96px, auto);
+  gap: 14px;
+  align-items: center;
+  min-width: 0;
+  min-height: 58px;
+  padding: 10px 0;
+  color: var(--color-text);
+  font-size: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.compareDetailTop {
+  display: contents;
+}
+
+.compareDetailRow:last-child {
+  border-bottom: 0;
+}
+
+.compareDetailTerm {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.compareDetailRow .compareDetailTerm {
+  grid-area: term;
+}
+
+.compareDetailTerm b {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text);
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compareDetailTerm small {
+  color: var(--color-muted);
+}
+
+.compareDetailBars {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.compareDetailRow .compareDetailBars {
+  grid-area: bars;
+}
+
+.compareDetailBarLine {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) minmax(38px, auto) minmax(46px, auto);
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.compareDetailBarLine > span {
+  color: var(--color-muted);
+  font-weight: 750;
+}
+
+.compareDetailBarLine::before {
+  grid-column: 2;
+  grid-row: 1;
+  height: 7px;
+  content: "";
+  background: var(--color-track);
+  border-radius: 999px;
+}
+
+.compareDetailBars i {
+  z-index: 1;
+  grid-column: 2;
+  grid-row: 1;
+  display: block;
+  height: 7px;
+  border-radius: 999px;
+}
+
+.compareDetailBarA {
+  background: linear-gradient(90deg, var(--color-primary), #15c878);
+}
+
+.compareDetailBarB {
+  background: linear-gradient(90deg, #2f80ed, #60a5fa);
+}
+
+.compareDetailBarLine b,
+.compareDetailBarLine small {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.compareDetailBarLine b {
+  font-weight: 650;
+}
+
+.compareDetailBarLine small {
+  color: var(--color-muted);
+}
+
+.compareDetailDiff {
+  display: grid;
+  gap: 4px;
+  justify-items: end;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.compareDetailRow .compareDetailDiff {
+  grid-area: diff;
+}
+
+.compareDetailDiff b {
+  color: var(--color-text);
+  font-weight: 750;
+}
+
+.compareDetailDiff small {
+  color: var(--color-muted);
+}
+
+.compareDetailDiff em {
+  justify-self: end;
+}
+
+.compareTermDiff b {
+  color: currentColor;
+}
+
+.insightsBlock {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.insightsBlock h2 {
+  color: var(--color-text);
+  font-size: 17px;
+}
+
+.insightGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.insightCard {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-height: 64px;
+  padding: 12px;
+}
+
+.insightCard svg {
+  color: var(--color-primary);
+}
+
+.insight_warning svg,
+.insight_error svg {
+  color: #d97706;
+}
+
+.insightCard p {
+  color: var(--color-sidebar-text);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+@media (max-width: 1180px) {
+  .summaryGrid,
+  .insightGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .twoColumnGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .compareCoverageGauges {
+    width: min(100%, 240px);
+    justify-self: center;
+  }
+}
+
+@media (max-width: 900px) {
+  .pickerGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .vsDivider {
+    min-height: 38px;
+  }
+
+  .vsDivider::before {
+    top: 50%;
+    right: 0;
+    bottom: auto;
+    left: 0;
+    width: auto;
+    height: 1px;
+  }
+
+  .settingsBar {
+    grid-template-columns: 1fr;
+  }
+
+  .settingsBar button {
+    justify-self: start;
+  }
+
+  .metricRow {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .metricName {
+    grid-column: 1 / -1;
+  }
+
+  .metricDiffBar {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .summaryGrid,
+  .insightGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .panelHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .coveragePills {
+    justify-content: flex-start;
+  }
+
+  .settingsBar button {
+    display: none;
+  }
+
+  .metricRows {
+    gap: 8px;
+    padding-bottom: 2px;
+  }
+
+  .metricRow {
+    grid-template-areas:
+      "name diff"
+      "a b"
+      "bar bar";
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 7px 10px;
+    align-items: center;
+    min-height: 0;
+    padding: 9px 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+  }
+
+  .metricRow:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .metricName {
+    grid-area: name;
+    grid-column: auto;
+    white-space: normal;
+  }
+
+  .metricRow em {
+    grid-area: diff;
+    justify-self: end;
+    align-self: center;
+  }
+
+  .metricDiffBar {
+    display: grid;
+    grid-area: bar;
+    width: 100%;
+    min-width: 0;
+    height: 18px;
+  }
+
+  .metricPill {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 6px;
+    justify-self: stretch;
+    min-width: 0;
+    padding: 6px 8px;
+    text-align: right;
+  }
+
+  .metricPill::before {
+    color: var(--color-muted);
+    font-weight: 750;
+  }
+
+  .metricRow .metricPill:nth-of-type(1) {
+    grid-area: a;
+  }
+
+  .metricRow .metricPill:nth-of-type(1)::before {
+    content: "A";
+  }
+
+  .metricRow .metricPill:nth-of-type(2) {
+    grid-area: b;
+  }
+
+  .metricRow .metricPill:nth-of-type(2)::before {
+    content: "B";
+  }
+
+  .compareCoverageGauges {
+    width: 100%;
+  }
+
+  .compareKeywordMiniRow {
+    grid-template-areas:
+      "name status"
+      "values values";
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px 10px;
+    align-items: start;
+    min-height: 0;
+    padding: 9px 10px;
+  }
+
+  .compareKeywordDesktopCount,
+  .compareKeywordDesktopDensity {
+    display: none;
+  }
+
+  .compareKeywordName {
+    grid-area: name;
+    align-self: center;
+    font-weight: 650;
+  }
+
+  .compareKeywordValues {
+    display: grid;
+    grid-area: values;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .compareKeywordValues span {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 2px 6px;
+    padding: 6px 8px;
+    background: var(--color-surface-soft);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+  }
+
+  .compareKeywordValues small {
+    grid-column: 2;
+  }
+
+  .compareKeywordMiniRow em {
+    grid-area: status;
+    align-self: center;
+    justify-self: end;
+  }
+
+  .compareTermRow {
+    grid-template-areas:
+      "term diff"
+      "bars bars";
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    min-height: 0;
+    padding: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+  }
+
+  .compareTermRow:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .compareTermRow .compareDetailTerm b {
+    white-space: normal;
+  }
+
+  .compareTermRow .compareDetailTerm {
+    grid-area: term;
+  }
+
+  .compareTermRow .compareDetailBars {
+    grid-area: bars;
+    gap: 9px;
+  }
+
+  .compareTermRow .compareDetailBarLine {
+    grid-template-areas:
+      "label count density"
+      "bar bar bar";
+    grid-template-columns: auto auto minmax(0, 1fr);
+    gap: 5px 8px;
+  }
+
+  .compareTermRow .compareDetailBarLine > span {
+    grid-area: label;
+  }
+
+  .compareTermRow .compareDetailBarLine::before,
+  .compareTermRow .compareDetailBars i {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .compareTermRow .compareDetailBarLine b {
+    grid-area: count;
+    text-align: left;
+  }
+
+  .compareTermRow .compareDetailBarLine small {
+    grid-area: density;
+    text-align: left;
+  }
+
+  .compareTermRow .compareDetailDiff {
+    grid-area: diff;
+    grid-template-columns: auto;
+    align-self: start;
+    justify-content: end;
+    justify-items: end;
+  }
+
+  .compareTermRow .compareTermDiff small {
+    display: none;
+  }
+
+  .compareTermDiff b {
+    padding: 3px 8px;
+    color: currentColor;
+    background: color-mix(in srgb, currentColor 10%, var(--color-surface));
+    border: 1px solid color-mix(in srgb, currentColor 22%, var(--color-border));
+    border-radius: 999px;
+  }
+
+  .compareTermValues {
+    justify-content: start;
+    text-align: left;
+  }
+
+  .keywordRow,
+  .termRow {
+    grid-template-columns: 1fr;
+  }
+
+  .compareDetailLegend {
+    justify-content: flex-start;
+  }
+
+  .compareDetailToolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .compareDetailFilters {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .compareDetailFilters :global([class*="detailControlGroup"]) {
+    grid-column: 1 / -1;
+  }
+
+  .compareDetailFilters :global([class*="detailDropdown"]) {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .compareDetailToolbar :global([class*="detailActionBar"]) {
+    width: auto;
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+
+  .compareDetailChart {
+    --compare-detail-scroll-gutter: 12px;
+  }
+
+  .compareDetailChart :global([class*="customScrollViewport"]) {
+    padding-top: 0;
+    padding-right: calc(10px + var(--compare-detail-scroll-gutter));
+  }
+
+  .compareDetailChart :global([class*="customScrollTrack"]) {
+    right: 3px;
+  }
+
+  .compareDetailRow {
+    grid-template-areas:
+      "top"
+      "bars";
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 9px;
+    min-width: 0;
+    padding: 10px 0;
+    overflow: hidden;
+    border-bottom: 1px solid var(--color-border);
+    border-radius: 0;
+  }
+
+  .compareDetailRow:last-child {
+    border-bottom: 0;
+  }
+
+  .compareDetailTop {
+    grid-area: top;
+    display: grid;
+    grid-template-areas: "term diff";
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: start;
+    min-width: 0;
+  }
+
+  .compareDetailTerm b {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .compareDetailRow b,
+  .compareDetailRow small {
+    text-align: left;
+  }
+
+  .compareDetailDiff {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    justify-content: flex-end;
+    justify-items: end;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .compareDetailDiff small {
+    display: none;
+  }
+
+  .compareDetailDiff em {
+    order: -1;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .keywordRow em,
+  .termRow em {
+    justify-self: start;
+  }
+
+  .tabs {
+    width: 100%;
+  }
+
+  .tabs button {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .actionRow button,
+  .emptyActions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 390px) {
+  .documentSelectButton {
+    grid-template-columns: 36px minmax(0, 1fr) 18px;
+    gap: 9px;
+    padding: 10px;
+  }
+
+  .documentBadge {
+    width: 36px;
+    height: 36px;
+  }
+
+  .metricRow {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+
+  .metricPill,
+  .metricRow em {
+    justify-self: start;
+  }
+
+  .compareDetailToolbar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .compareDetailToolbar :global([class*="detailActionBar"]) {
+    justify-content: flex-start;
+  }
+
+  .compareDetailBarLine {
+    grid-template-areas:
+      "label count density"
+      "bar bar bar";
+    grid-template-columns: auto auto minmax(0, 1fr);
+    gap: 5px 8px;
+  }
+
+  .compareDetailBarLine > span {
+    grid-area: label;
+  }
+
+  .compareDetailBarLine::before,
+  .compareDetailBars i {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .compareDetailBarLine b {
+    grid-area: count;
+  }
+
+  .compareDetailBarLine small {
+    grid-area: density;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

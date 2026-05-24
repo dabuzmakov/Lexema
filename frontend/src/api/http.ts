@@ -1,10 +1,10 @@
-import type { ApiEnvelope, ApiErrorPayload } from '../types/api'
+import type { ApiEnvelope, ApiErrorPayload } from '../Models/api'
 
 export const API_BASE_URL = (
   import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://localhost:8000' : '')
 ).replace(/\/+$/, '')
 
-export const USE_MOCK_API = import.meta.env.VITE_USE_MOCK_API === 'true'
+export const USE_MOCK_API = import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true'
 
 function getErrorMessage(payload: ApiErrorPayload | null, status: number) {
   if (!payload) {

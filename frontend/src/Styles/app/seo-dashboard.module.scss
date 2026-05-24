@@ -1,0 +1,1797 @@
+/* SEO dashboard, preview, charts, details modal. Cascade layer; keep import order in src/App/Styles.module.scss. */
+.seoPage {
+  display: grid;
+  grid-template-rows: none;
+  gap: clamp(16px, 1.7vh, 22px);
+  width: min(100%, 1560px);
+  height: auto;
+  min-height: 0;
+  margin-inline: auto;
+}
+
+.seoDashboard {
+  display: grid;
+  gap: clamp(16px, 1.7vh, 22px);
+  min-width: 0;
+}
+
+.seoControlCard {
+  --seo-control-button-height: 38px;
+  --seo-control-card-height: clamp(360px, 47vh, 430px);
+  --seo-control-card-padding-block: 40px;
+  --seo-control-header-height: 24px;
+  --seo-control-gap: 16px;
+  --seo-control-gap-total: calc(var(--seo-control-gap) * 2);
+  --seo-control-content-height: calc(
+    var(--seo-control-card-height)
+    - var(--seo-control-card-padding-block)
+    - var(--seo-control-header-height)
+    - var(--seo-control-gap-total)
+    - var(--seo-control-button-height)
+  );
+
+  display: grid;
+  align-content: stretch;
+  overflow: hidden;
+  min-width: 0;
+  height: var(--seo-control-card-height);
+  min-height: 0;
+  max-height: var(--seo-control-card-height);
+}
+
+.seoDocumentControlCard {
+  align-content: stretch;
+  container-type: inline-size;
+  grid-template-rows: var(--seo-control-header-height) minmax(0, 1fr) auto;
+  gap: var(--seo-control-gap);
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+}
+
+.seoSettingsControlCard {
+  align-content: stretch;
+  grid-template-rows: var(--seo-control-header-height) minmax(0, 1fr) var(--seo-control-button-height);
+  gap: var(--seo-control-gap);
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+}
+
+.customScrollArea {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.customScrollViewport {
+  height: 100%;
+  max-height: inherit;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.customScrollViewport::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.customScrollTrack {
+  position: absolute;
+  top: 8px;
+  right: 5px;
+  bottom: 8px;
+  width: 2px;
+  pointer-events: none;
+  opacity: 0.55;
+  transition: opacity 120ms ease;
+}
+
+.customScrollArea:hover .customScrollTrack,
+.customScrollArea:focus-within .customScrollTrack {
+  opacity: 0.78;
+}
+
+.customScrollThumb {
+  width: 100%;
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+  transition:
+    background-color 120ms ease,
+    transform 120ms ease;
+}
+
+.customScrollArea:hover .customScrollThumb,
+.customScrollArea:focus-within .customScrollThumb {
+  background: var(--scrollbar-thumb-hover);
+}
+
+.emptyPlaceholder {
+  display: grid;
+  gap: 8px;
+  align-content: center;
+  justify-items: center;
+  width: 100%;
+  min-height: 96px;
+  padding: 18px;
+  color: var(--color-muted);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  background: var(--color-surface-soft);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-control);
+}
+
+.emptyPlaceholder svg {
+  color: var(--color-primary);
+}
+
+.emptyPlaceholderCompact {
+  min-height: 72px;
+  padding: 12px;
+}
+
+.emptyPlaceholderFill {
+  min-height: 0;
+  height: 100%;
+  align-self: stretch;
+}
+
+.seoBlockHeader,
+.seoResultHeader,
+.textPreviewHeader,
+.detailHeader,
+.riskHeader {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.seoBlockHeader h2,
+.seoResultHeader h2,
+.textPreviewHeader h2,
+.detailHeader h2 {
+  color: var(--color-text);
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.seoHeaderTitle {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.seoHeaderTitle svg {
+  flex: 0 0 auto;
+  color: var(--color-primary);
+}
+
+.seoBlockHeader p,
+.textPreviewHeader p,
+.detailHeader p {
+  margin-top: 4px;
+  color: var(--color-muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.seoDocumentPickList {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.seoDocumentPickList .customScrollViewport {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 6px 12px 6px 6px;
+}
+
+.seoBlockHeader .mutedCounter {
+  color: var(--color-muted);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.seoDocumentControlCard > .seoBlockHeader,
+.seoSettingsControlCard > .seoBlockHeader {
+  min-height: 0;
+  height: var(--seo-control-header-height);
+  align-items: center;
+}
+
+.seoDocumentActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: stretch;
+  height: auto;
+  min-height: 0;
+  padding-top: 0;
+}
+
+.seoDocumentBulkActions {
+  display: contents;
+}
+
+.seoDocumentBulkActions .secondaryButton {
+  flex: 1 1 0;
+  height: 100%;
+  min-height: var(--seo-control-button-height);
+  min-width: 104px;
+  padding-inline: clamp(8px, 0.8vw, 11px);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1;
+}
+
+.seoDocumentBulkActions .secondaryButton svg {
+  display: block;
+  flex: 0 0 auto;
+  color: var(--color-text);
+}
+
+.seoAnalyzeButton {
+  flex: 1 1 0;
+  height: var(--seo-control-button-height);
+  min-height: var(--seo-control-button-height);
+  min-width: 126px;
+  width: auto;
+  padding-inline: clamp(10px, 1vw, 14px);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1;
+}
+
+.seoSettingsControlCard .secondaryButtonWide {
+  height: var(--seo-control-button-height);
+  min-height: 0;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.seoAnalyzeButton:disabled {
+  color: var(--color-muted);
+  background: var(--color-track);
+  border-color: var(--color-border);
+  opacity: 1;
+}
+
+@container (max-width: 520px) {
+  .seoDocumentBulkActions .secondaryButton,
+  .seoAnalyzeButton {
+    flex-basis: calc(50% - 4px);
+  }
+}
+
+@container (max-width: 360px) {
+  .seoDocumentBulkActions .secondaryButton,
+  .seoAnalyzeButton {
+    flex-basis: 100%;
+  }
+}
+
+.seoPickRow {
+  position: relative;
+  display: grid;
+  grid-template-columns: 20px 30px minmax(0, 1fr) 18px;
+  gap: 10px;
+  align-items: center;
+  height: 56px;
+  min-width: 0;
+  padding: 9px 11px;
+  cursor: pointer;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.seoPickRow:hover,
+.seoPickRowSelected {
+  border-color: color-mix(in srgb, var(--color-primary) 48%, var(--color-border));
+  background: var(--color-primary-soft);
+}
+
+.seoPickRow input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.seoCheckmark {
+  display: grid;
+  align-self: center;
+  justify-self: center;
+  width: 18px;
+  height: 18px;
+  color: #fff;
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  border-radius: 5px;
+  place-items: center;
+}
+
+.seoPickRowSelected .seoCheckmark {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.seoDocumentIcon {
+  display: grid;
+  align-self: center;
+  width: 30px;
+  height: 30px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border-radius: 7px;
+  place-items: center;
+}
+
+.seoPickText {
+  display: grid;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.seoPickText b {
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seoPickText small {
+  overflow: hidden;
+  color: var(--color-muted);
+  font-size: 13px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seoPickRow > svg {
+  color: var(--color-sidebar-text);
+  justify-self: end;
+}
+
+@media (max-width: 1440px) {
+  .analysisTopGrid,
+  .seoControlCard {
+    --seo-control-card-height: clamp(352px, 47vh, 410px);
+  }
+
+  .seoPickRow {
+    height: 54px;
+  }
+}
+
+@media (max-width: 1366px) {
+  .analysisTopGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.82fr);
+    gap: 16px;
+  }
+
+  .analysisTopGrid,
+  .seoControlCard {
+    --seo-control-card-height: clamp(390px, 51vh, 428px);
+  }
+
+  .seoDocumentActions {
+    grid-template-columns: max-content minmax(132px, 1fr);
+  }
+
+  .seoDocumentBulkActions {
+    gap: 6px;
+  }
+
+  .seoDocumentBulkActions .secondaryButton {
+    gap: 7px;
+    padding-inline: 10px;
+  }
+
+  .chartActionButton {
+    min-height: 28px;
+    padding-inline: 7px;
+  }
+
+  .seoPrimaryGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 0.9fr);
+    height: auto;
+  }
+
+  .textPreviewToolbar {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 1280px) {
+  .analysisTopGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.78fr);
+    gap: 14px;
+  }
+
+  .analysisTopGrid,
+  .seoControlCard {
+    --seo-control-button-height: 40px;
+    --seo-control-card-height: clamp(378px, 50vh, 410px);
+    --seo-control-card-padding-block: 40px;
+    --seo-control-gap: 20px;
+  }
+
+  .seoDocumentPickList .customScrollViewport {
+    gap: 7px;
+    padding: 5px 12px 5px 5px;
+  }
+
+  .seoPickRow {
+    height: 52px;
+    padding-block: 8px;
+  }
+}
+
+@media (max-height: 780px) and (min-width: 1181px) {
+  .analysisTopGrid,
+  .seoControlCard {
+    --seo-control-button-height: 40px;
+    --seo-control-card-height: clamp(368px, 54vh, 396px);
+    --seo-control-card-padding-block: 40px;
+    --seo-control-gap: 18px;
+  }
+
+  .seoPickRow {
+    height: 50px;
+  }
+
+}
+
+@media (max-height: 700px) and (min-width: 1181px) {
+  .analysisTopGrid,
+  .seoControlCard {
+    --seo-control-card-height: clamp(352px, 56vh, 376px);
+    --seo-control-gap: 16px;
+  }
+
+  .seoPickRow {
+    height: 46px;
+    padding-block: 7px;
+  }
+
+  .seoDocumentIcon {
+    width: 28px;
+    height: 28px;
+  }
+
+}
+
+.seoSettingsRows {
+  display: grid;
+  grid-template-rows: repeat(5, minmax(0, 1fr));
+  align-content: start;
+  gap: 10px;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.seoInfoRow {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 0;
+  padding: 0 13px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.seoInfoRow span {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.seoInfoRow b {
+  max-width: 52%;
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 650;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seoSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.seoMetricCard {
+  display: grid;
+  grid-template-columns: 34px minmax(0, max-content);
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  min-height: 62px;
+  padding: 11px 14px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  text-align: left;
+}
+
+.seoMetricIcon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border-radius: 10px;
+  place-items: center;
+}
+
+.seoMetricCard div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  justify-items: start;
+}
+
+.seoMetricCard span:not(.seoMetricIcon) {
+  overflow: hidden;
+  color: var(--color-muted);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seoMetricCard b {
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: clamp(18px, 1.2vw, 22px);
+  font-weight: 650;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seoMetricCard small {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.textPreviewCard {
+  display: grid;
+  grid-template-rows: auto auto auto auto minmax(0, 1fr);
+  gap: 14px;
+  min-height: 0;
+  min-width: 0;
+  height: var(--seo-primary-height, 100%);
+  max-height: var(--seo-primary-height, none);
+  overflow: hidden;
+}
+
+.textPreviewCardEmpty {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.textPreviewControls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+}
+
+.textPreviewCounter {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  background: var(--color-primary-soft);
+  border-radius: 999px;
+}
+
+.customSelectField {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.customSelectLabel {
+  color: var(--color-muted);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.customSelect {
+  position: relative;
+  z-index: 5;
+  min-width: 0;
+}
+
+.customSelect > button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16px;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  min-height: 52px;
+  padding: 8px 10px;
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+
+.customSelectOpen > button {
+  border-color: var(--color-border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+}
+
+.customSelectValue {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+
+.customSelectIcon,
+.customSelectOptionIcon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border-radius: 10px;
+  place-items: center;
+}
+
+.customSelectText,
+.customSelectOptionText {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.customSelectText b,
+.customSelectText small,
+.customSelectOptionText b,
+.customSelectOptionText small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.customSelectText b,
+.customSelectOptionText b {
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.customSelectText small,
+.customSelectOptionText small {
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.customSelectChevron {
+  color: var(--color-muted);
+  transform: rotate(90deg);
+}
+
+.customSelectMenu {
+  position: absolute;
+  z-index: 12;
+  top: calc(100% - 1px);
+  right: 0;
+  left: 0;
+  max-height: 268px;
+  padding: 8px 6px 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  box-shadow: var(--shadow-card);
+  animation: dropdownSlide 140ms ease-out;
+  transform-origin: top center;
+}
+
+.customSelectMenu .customScrollViewport {
+  display: grid;
+  gap: 4px;
+  padding-right: 10px;
+  padding-bottom: 8px;
+}
+
+.customSelectMenu button {
+  width: 100%;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  border-radius: 8px;
+}
+
+.customSelectOption {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 18px;
+  gap: 10px;
+  align-items: center;
+  min-height: 50px;
+  padding: 8px 9px;
+  border: 0;
+  border-radius: 8px;
+}
+
+.customSelectOptionCheck {
+  display: grid;
+  width: 18px;
+  height: 18px;
+  color: var(--color-primary);
+  place-items: center;
+}
+
+.customSelectActive,
+.customSelectMenu button:hover {
+  color: var(--color-text);
+  background: var(--color-surface-soft);
+}
+
+.customSelectActive .customSelectOption,
+.customSelectMenu button:hover .customSelectOption {
+  background: transparent;
+}
+
+.textPreviewToolbar {
+  display: block;
+  min-width: 0;
+}
+
+.highlightControls {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  width: 100%;
+}
+
+.highlightToggle {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 9px;
+  justify-content: center;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+}
+
+.textPreviewContentLabel {
+  color: var(--color-muted);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.highlightToggle i {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+}
+
+.highlightToggleLabel {
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.highlightToggleMark {
+  display: grid;
+  width: 14px;
+  height: 14px;
+  color: var(--color-primary);
+  place-items: center;
+}
+
+.highlightToggleActive {
+  color: var(--color-text);
+  background: var(--color-surface-soft);
+  border-color: color-mix(in srgb, var(--color-primary) 22%, var(--color-border));
+}
+
+.textPreviewMeta {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.textPreviewMeta span {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.textPreviewMeta b {
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.textPreviewScroll {
+  display: grid;
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+}
+
+.textPreviewScroll .customScrollViewport {
+  display: grid;
+  height: 100%;
+  max-height: 100%;
+  padding: 14px 18px 14px 14px;
+}
+
+.textPreviewContent {
+  display: grid;
+  height: 100%;
+  min-height: 100%;
+}
+
+.textPreviewEmptySlot {
+  display: grid;
+  height: 100%;
+  min-height: 100%;
+}
+
+.textPreviewScroll p {
+  color: var(--color-text);
+  font-size: 13px;
+  line-height: 1.58;
+  white-space: pre-wrap;
+}
+
+.textPreviewScroll mark {
+  color: inherit;
+  border-radius: 4px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.highlightDot_keywords {
+  background: #20b26b;
+}
+
+.highlightTagKeyword {
+  color: #158853;
+  background: color-mix(in srgb, #20b26b 20%, transparent);
+}
+
+.highlightDot_stop {
+  background: #f5a524;
+}
+
+.highlightTagStop {
+  color: #b46a00;
+  background: color-mix(in srgb, #f5a524 24%, transparent);
+}
+
+.highlightDot_water {
+  background: #4b8fe8;
+}
+
+.highlightTagWater {
+  color: #2f6fc3;
+  background: color-mix(in srgb, #4b8fe8 20%, transparent);
+}
+
+.highlightDot_mixed {
+  background: #ef5350;
+}
+
+.highlightTagMixed {
+  color: #cf2f2c;
+  background: color-mix(in srgb, #ef5350 16%, transparent);
+}
+
+.seoPrimaryGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.95fr);
+  gap: 14px;
+  align-items: stretch;
+  height: var(--seo-primary-height, auto);
+  max-height: var(--seo-primary-height, none);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.seoInsightsStack {
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 14px;
+  min-height: 0;
+  align-content: start;
+}
+
+.seoInsightsStack > .seoResultCard {
+  --insight-section-gap: 18px;
+
+  grid-template-rows: auto auto auto;
+  height: auto;
+  align-content: start;
+  gap: var(--insight-section-gap);
+  padding: var(--insight-section-gap);
+}
+
+.seoInsightsStack .seoBarChart {
+  align-self: start;
+  gap: 12px;
+}
+
+.seoInsightsStack .emptyPlaceholder {
+  min-height: 100%;
+}
+
+.seoResultGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.95fr);
+  gap: 14px;
+  align-items: stretch;
+}
+
+.seoResultCard {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+  align-content: start;
+  overflow: hidden;
+}
+
+.seoResultGrid > .seoResultCard:nth-child(2) {
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: stretch;
+}
+
+.seoResultCardWide {
+  grid-column: 1 / -1;
+}
+
+.seoResultHeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+}
+
+.seoResultHeader .seoHeaderTitle {
+  flex: 1 1 190px;
+}
+
+.seoHeaderText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seoActionGroup {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 0 1 auto;
+  gap: 6px;
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.seoResultFooterActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding-top: 0;
+}
+
+.chartActionButton {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 8px;
+  color: var(--color-sidebar-text);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.chartActionButton:hover {
+  color: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 40%, var(--color-border));
+}
+
+.chartActionButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.seoSegmented {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(96px, 1fr));
+  width: fit-content;
+  padding: 3px;
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+}
+
+.seoSegmented button {
+  min-height: 30px;
+  padding: 0 12px;
+  color: var(--color-muted);
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  border-radius: 7px;
+}
+
+.seoSegmented button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.seoSegmentedActive {
+  color: #fff !important;
+  background: var(--color-primary);
+}
+
+.seoBarChart {
+  display: grid;
+  gap: 8px;
+}
+
+.seoBarChartEmpty {
+  display: grid;
+  min-height: 178px;
+}
+
+.seoBarChartExpanded {
+  gap: 12px;
+}
+
+.seoBarRow {
+  display: grid;
+  grid-template-columns: minmax(96px, 0.8fr) minmax(96px, 1.2fr) 48px 58px;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  color: var(--color-text);
+  font-size: 12px;
+}
+
+.seoBarRow > span {
+  overflow: hidden;
+  color: var(--color-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seoBarRow > div {
+  height: 8px;
+  overflow: hidden;
+  background: var(--color-track);
+  border-radius: 999px;
+}
+
+.seoBarRow i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), #15c878);
+  border-radius: inherit;
+}
+
+.seoBarRow b,
+.seoBarRow small {
+  text-align: right;
+}
+
+.seoBarRow b {
+  color: var(--color-text);
+  font-weight: 650;
+}
+
+.seoBarRow small {
+  color: var(--color-muted);
+}
+
+.keywordCoverageGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 94px;
+  gap: 14px;
+  align-items: center;
+}
+
+.keywordCoverageGrid .keywordMiniScroll {
+  order: 1;
+}
+
+.keywordCoverageGrid .keywordCoverageGauge {
+  order: 2;
+}
+
+.keywordCoverageGauge {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  min-width: 0;
+  text-align: center;
+}
+
+.keywordCoverageGauge h3 {
+  color: var(--color-muted);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.coverageDonut {
+  --percent: 0%;
+
+  position: relative;
+  display: grid;
+  width: 92px;
+  height: 92px;
+  margin: 0 auto;
+  background: conic-gradient(var(--color-primary) 0 var(--percent), var(--color-track) var(--percent) 100%);
+  border-radius: 50%;
+  place-items: center;
+}
+
+.coverageDonut::before {
+  content: "";
+  position: absolute;
+  inset: 11px;
+  background: var(--color-surface);
+  border-radius: 50%;
+}
+
+.coverageDonut span {
+  position: relative;
+  z-index: 1;
+  font-size: 17px;
+  font-weight: 850;
+}
+
+.keywordMiniList {
+  display: grid;
+  gap: 6px;
+  min-height: 100%;
+  min-width: 0;
+}
+
+.keywordMiniScroll {
+  height: 100%;
+  max-height: 214px;
+  min-height: 0;
+}
+
+.keywordMiniScroll .customScrollViewport {
+  height: 100%;
+  padding-right: 10px;
+}
+
+.keywordMiniRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 38px 54px 78px;
+  gap: 7px;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 9px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.keywordMiniRow span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.keywordMiniRow small {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.keywordStatus {
+  justify-self: end;
+  padding: 3px 7px;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 650;
+  border-radius: 999px;
+}
+
+.keywordStatusFound {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.keywordStatusMissing {
+  color: var(--color-danger);
+  background: #ffecec;
+}
+
+.waterSpamCompact {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-around;
+  align-self: center;
+  min-height: 150px;
+}
+
+.waterSpamGauge .coverageDonut span {
+  max-width: 58px;
+  font-size: 13px;
+  line-height: 1.05;
+  text-align: center;
+}
+
+.waterSpamGauge {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  min-width: 0;
+  text-align: center;
+}
+
+.waterSpamGauge h3 {
+  color: var(--color-muted);
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.waterSpamCompact p,
+.calmState,
+.spamWarningList p {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.seoProgressTrack {
+  height: 11px;
+  overflow: hidden;
+  background: var(--color-track);
+  border-radius: 999px;
+}
+
+.seoProgressTrack span {
+  display: block;
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: inherit;
+}
+
+.spamWarningList {
+  display: grid;
+  gap: 7px;
+}
+
+.spamWarningList p,
+.calmState,
+.spamWarningSummary {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+
+.spamWarningList svg,
+.spamWarningSummary svg {
+  color: #d97706;
+}
+
+.calmState svg {
+  color: var(--color-primary);
+}
+
+.structureGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  align-items: start;
+}
+
+.structureChart {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.structureChart h3 {
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.structureChart .seoBarRow {
+  grid-template-columns: minmax(96px, 0.55fr) minmax(160px, 1.6fr) 56px 64px;
+}
+
+.structureMetrics {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.95fr);
+  gap: 14px;
+  width: 100%;
+}
+
+.structureMetric {
+  display: grid;
+  gap: 4px;
+  min-height: 68px;
+  padding: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  align-content: center;
+}
+
+.structureMetric span {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.structureMetric b {
+  color: var(--color-text);
+  font-size: 16px;
+  font-weight: 650;
+}
+
+.mixedCompactScroll {
+  max-height: clamp(170px, 26vh, 300px);
+  padding: 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+}
+
+.mixedCompactScroll .customScrollViewport {
+  display: grid;
+  gap: 6px;
+  padding-right: 10px;
+}
+
+.mixedCompactList {
+  display: grid;
+  gap: 6px;
+}
+
+.mixedCompactHeader {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  display: grid;
+  grid-template-columns: minmax(140px, 0.85fr) minmax(180px, 1fr) 74px;
+  gap: 10px;
+  padding: 4px 10px;
+  color: var(--color-muted);
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--color-surface);
+}
+
+.mixedCompactHeader span:last-child {
+  text-align: right;
+}
+
+.mixedCompactRow {
+  display: grid;
+  grid-template-columns: minmax(140px, 0.85fr) minmax(180px, 1fr) 74px;
+  gap: 10px;
+  align-items: center;
+  min-height: 42px;
+  padding: 0 12px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.mixedCompactRow b {
+  color: var(--color-text);
+}
+
+.mixedCompactRow b span {
+  color: var(--color-text);
+}
+
+.mixedCompactRow b .highlightTagMixed {
+  color: var(--color-danger);
+}
+
+.mixedCompactRow span {
+  color: var(--color-danger);
+  font-size: 12px;
+}
+
+.mixedCompactRow strong {
+  color: var(--color-text);
+  font-weight: 650;
+  text-align: right;
+}
+
+.linkButton {
+  justify-self: start;
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.detailOverlay {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  padding: 24px;
+  background: rgba(16, 24, 40, 0.34);
+  place-items: center;
+}
+
+.detailModal {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(1100px, calc(100vw - 48px));
+  height: min(820px, calc(100vh - 48px));
+  max-height: calc(100vh - 48px);
+  padding: 22px;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.detailHeader {
+  flex: 0 0 auto;
+}
+
+.detailHeader button {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  color: var(--color-sidebar-text);
+  cursor: pointer;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  place-items: center;
+}
+
+.detailToolbar {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: end;
+  justify-content: space-between;
+  padding: 10px;
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+}
+
+.detailFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: end;
+  min-width: 0;
+}
+
+.detailControlGroup,
+.detailNumberControl {
+  display: inline-grid;
+  gap: 5px;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.detailNumberControl input {
+  width: 92px;
+  height: 34px;
+  padding: 0 10px;
+  color: var(--color-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  outline: 0;
+}
+
+.detailNumberControl input::-webkit-outer-spin-button,
+.detailNumberControl input::-webkit-inner-spin-button {
+  margin: 0;
+}
+
+.detailNumberControl input:focus {
+  border-color: color-mix(in srgb, var(--color-primary) 46%, var(--color-border));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 12%, transparent);
+}
+
+.detailDropdown {
+  position: relative;
+  min-width: 148px;
+}
+
+.detailDropdownButton {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 15px;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  min-height: 34px;
+  padding: 0 10px;
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.detailDropdown:has(.detailDropdownMenu) .detailDropdownButton {
+  border-bottom-color: transparent;
+  border-radius: 8px 8px 0 0;
+}
+
+.detailDropdownButton span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.detailDropdownButton svg {
+  color: var(--color-muted);
+  transform: rotate(90deg);
+}
+
+.detailDropdownMenu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% - 1px);
+  right: 0;
+  left: 0;
+  display: grid;
+  gap: 3px;
+  padding: 5px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0 0 9px 9px;
+  box-shadow: var(--shadow-card);
+  animation: dropdownSlide 140ms ease-out;
+  transform-origin: top center;
+}
+
+.detailDropdownMenu button {
+  min-height: 30px;
+  padding: 0 9px;
+  color: var(--color-sidebar-text);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  border-radius: 7px;
+}
+
+.detailDropdownMenu button:hover,
+.detailDropdownActive {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.detailCopyNotice {
+  position: absolute;
+  right: 50%;
+  bottom: calc(100% + 8px);
+  z-index: 3;
+  padding: 6px 9px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 750;
+  white-space: nowrap;
+  pointer-events: none;
+  background: #111827;
+  border-radius: 8px;
+  box-shadow: var(--shadow-card);
+  transform: translateX(50%);
+  opacity: 0;
+  animation: copyNoticeFloat 900ms ease-in-out forwards;
+}
+
+.detailAllButton,
+.detailAllButtonActive {
+  align-self: end;
+  min-height: 34px;
+  padding: 0 12px;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.detailAllButtonActive {
+  color: #fff;
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.detailActionBar {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 6px;
+  align-items: end;
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.detailChart {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: clamp(420px, 62vh, 680px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+}
+
+.detailChart .customScrollViewport {
+  height: 100%;
+  padding: 16px;
+}
+
+.detailChartEmpty {
+  display: grid;
+  min-height: 100%;
+}
+
+.detailChart .customScrollViewport::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.detailChartRows {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.detailChartRow {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.9fr) minmax(170px, 1.35fr) 58px 70px;
+  gap: 10px;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 12px;
+  color: var(--color-text);
+  font-size: 12px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.detailChartRowKeywords {
+  grid-template-columns: minmax(160px, 0.85fr) minmax(150px, 1fr) 54px 66px 92px;
+}
+
+.detailChartRow > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detailChartBar {
+  height: 8px;
+  overflow: hidden;
+  background: var(--color-track);
+  border-radius: 999px;
+}
+
+.detailChartBar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), #15c878);
+  border-radius: inherit;
+}
+
+.detailChartRow b,
+.detailChartRow small {
+  text-align: right;
+}
+
+.detailChartRow b {
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+.detailChartRow small {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+

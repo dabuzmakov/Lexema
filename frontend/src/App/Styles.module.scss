@@ -1,0 +1,11 @@
+/* Keep this order: these layers preserve the existing cascade. */
+@use '../Styles/app/shell-layout-shared.module';
+@use '../Styles/app/seo-base.module';
+@use '../Styles/app/documents-page.module';
+@use '../Styles/app/settings-modal.module';
+@use '../Styles/app/responsive-layout.module';
+@use '../Styles/app/seo-dashboard.module';
+@use '../Styles/app/seo-responsive.module';
+@use '../Styles/app/responsive-integrity.module';
+@use '../Styles/app/mobile-layout.module';
+@use '../Styles/app/mobile-components.module';

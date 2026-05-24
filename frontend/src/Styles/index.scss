@@ -1,0 +1,39 @@
+@use './variables';
+
+body {
+  min-width: 320px;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  background: transparent;
+}
+
+a {
+  color: inherit;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+::selection {
+  color: #fff;
+  background: var(--color-primary);
+}
+
+:focus-visible {
+  outline: 3px solid rgb(79 129 105 / 26%);
+  outline-offset: 2px;
+}
+

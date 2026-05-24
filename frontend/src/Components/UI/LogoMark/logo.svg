@@ -1,0 +1,6 @@
+<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Lexema logo">
+  <rect width="48" height="48" rx="13" fill="#111719" />
+  <path d="M12 19H34" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-width="6.4" />
+  <path d="M12 31.5H22.6" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-width="6.4" />
+  <circle cx="34" cy="31.5" r="3.2" fill="#00a35a" />
+</svg>
