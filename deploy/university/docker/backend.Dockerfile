@@ -5,9 +5,16 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends openjdk-17-jre-headless \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY backend/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
+
+COPY backend/scripts/check_spelling_engine.py ./scripts/check_spelling_engine.py
+RUN python scripts/check_spelling_engine.py --runtime-only
 
 COPY backend/ ./
 
