@@ -83,3 +83,64 @@ def seo_table_to_csv(table_type: str, result: Dict[str, Any]) -> Tuple[List[str]
             "seo_mixed.csv",
         )
     raise HTTPException(status_code=404, detail="Unknown SEO export type")
+
+
+def compare_table_to_csv(table_type: str, result: Dict[str, Any]) -> Tuple[List[str], List[List[Any]], str]:
+    if table_type == "words":
+        rows = result.get("words_comparison", {}).get("common", [])
+        return (
+            ["Слово", "A частота", "B частота", "A плотность", "B плотность", "Разница частоты", "Разница плотности"],
+            [
+                [
+                    row.get("word", ""),
+                    row.get("a_count", 0),
+                    row.get("b_count", 0),
+                    row.get("a_density", 0),
+                    row.get("b_density", 0),
+                    row.get("diff_count", 0),
+                    row.get("diff_density", 0),
+                ]
+                for row in rows
+            ],
+            "compare_words.csv",
+        )
+    if table_type == "ngrams":
+        rows = result.get("ngrams_comparison", {}).get("common", [])
+        return (
+            ["Фраза", "N", "A частота", "B частота", "A плотность", "B плотность", "Разница частоты", "Разница плотности"],
+            [
+                [
+                    row.get("phrase", ""),
+                    row.get("n", ""),
+                    row.get("a_count", 0),
+                    row.get("b_count", 0),
+                    row.get("a_density", 0),
+                    row.get("b_density", 0),
+                    row.get("diff_count", 0),
+                    row.get("diff_density", 0),
+                ]
+                for row in rows
+            ],
+            "compare_ngrams.csv",
+        )
+    if table_type == "keywords":
+        return (
+            ["Ключ", "A найден", "A частота", "A плотность", "B найден", "B частота", "B плотность", "Разница частоты", "Разница плотности", "Статус"],
+            [
+                [
+                    row.get("keyword", ""),
+                    "да" if row.get("a", {}).get("found") else "нет",
+                    row.get("a", {}).get("count", 0),
+                    row.get("a", {}).get("density", 0),
+                    "да" if row.get("b", {}).get("found") else "нет",
+                    row.get("b", {}).get("count", 0),
+                    row.get("b", {}).get("density", 0),
+                    row.get("diff_count", 0),
+                    row.get("diff_density", 0),
+                    row.get("status", ""),
+                ]
+                for row in result.get("keywords_comparison", [])
+            ],
+            "compare_keywords.csv",
+        )
+    raise HTTPException(status_code=404, detail="Unknown compare export type")

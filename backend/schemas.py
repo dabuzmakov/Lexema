@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import List, Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -60,34 +60,6 @@ class DocumentPatchRequest(BaseModel):
         return stripped
 
 
-class BulkDocumentItem(BaseModel):
-    id: Optional[Union[str, int]] = None
-    client_document_id: Optional[str] = None
-    title: Optional[str] = None
-    content: str = Field(..., min_length=1)
-
-    @field_validator("title")
-    @classmethod
-    def strip_optional_title(cls, value: Optional[str]) -> Optional[str]:
-        if value is None:
-            return None
-        stripped = value.strip()
-        return stripped or None
-
-    @field_validator("content")
-    @classmethod
-    def strip_required_content(cls, value: str) -> str:
-        stripped = value.strip()
-        if not stripped:
-            raise ValueError("must not be blank")
-        return stripped
-
-
-class BulkDocumentsRequest(BaseModel):
-    browser_id: str = Field(..., min_length=1)
-    documents: List[BulkDocumentItem] = Field(default_factory=list, max_length=MAX_DOCUMENTS)
-
-
 class SettingsRequest(BaseModel):
     browser_id: str = Field(..., min_length=1)
     settings: AnalysisSettings
@@ -99,16 +71,20 @@ class SeoAnalysisRequest(BaseModel):
     params: Optional[AnalysisSettings] = None
 
 
-class LegacyDocumentModel(BaseModel):
-    id: int
-    content: str
+class SpellingAnalysisRequest(BaseModel):
+    browser_id: str = Field(..., min_length=1)
+    document_ids: List[str] = Field(default_factory=list, max_length=MAX_DOCUMENTS)
 
 
-class LegacyCorpusRequest(BaseModel):
-    browser_id: str
-    documents: List[LegacyDocumentModel] = Field(..., max_length=MAX_DOCUMENTS)
+class CompareAnalysisRequest(BaseModel):
+    browser_id: str = Field(..., min_length=1)
+    document_a_id: str = Field(..., min_length=1)
+    document_b_id: str = Field(..., min_length=1)
 
-
-class LegacyAnalysisRequest(BaseModel):
-    browser_id: str
-    params: Dict[str, Any] = Field(default_factory=dict)
+    @field_validator("browser_id", "document_a_id", "document_b_id")
+    @classmethod
+    def strip_required_identifier(cls, value: str) -> str:
+        stripped = value.strip()
+        if not stripped:
+            raise ValueError("must not be blank")
+        return stripped

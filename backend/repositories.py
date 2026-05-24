@@ -1,11 +1,11 @@
 import json
 import re
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional
 
 import asyncpg
 from fastapi import HTTPException
 
-from config import SEO_ANALYSIS_TYPE
+from config import COMPARE_ANALYSIS_TYPE, DOCUMENT_ANALYSIS_TYPES, SEO_ANALYSIS_TYPE
 from schemas import AnalysisSettings
 from services.text_utils import count_words, normalize_text_unit
 
@@ -112,7 +112,12 @@ async def save_settings_record(
         ngram_sizes,
         settings.spam.threshold_percent,
     )
-    await invalidate_analysis(conn, client_id, "Параметры анализа изменены")
+    await invalidate_analysis(
+        conn,
+        client_id,
+        "Параметры анализа изменены",
+        [SEO_ANALYSIS_TYPE, COMPARE_ANALYSIS_TYPE],
+    )
     return settings_to_dict(row)
 
 
@@ -166,24 +171,29 @@ async def fetch_selected_documents(
     return [document_to_dict(row) for row in rows]
 
 
-async def invalidate_analysis(conn: asyncpg.Connection, client_id: int, reason: str) -> None:
+async def invalidate_analysis(
+    conn: asyncpg.Connection,
+    client_id: int,
+    reason: str,
+    analysis_types: Optional[List[str]] = None,
+) -> None:
+    target_types = analysis_types or [SEO_ANALYSIS_TYPE]
     await conn.execute(
         """
         UPDATE analysis_results
         SET is_actual = FALSE,
             invalidation_reason = $3,
             updated_at = NOW()
-        WHERE client_id = $1 AND analysis_type = $2
+        WHERE client_id = $1 AND analysis_type = ANY($2::text[])
         """,
         client_id,
-        SEO_ANALYSIS_TYPE,
+        target_types,
         reason,
     )
 
 
-async def load_words_table(conn: asyncpg.Connection, table_name: str, column_name: str) -> Set[str]:
-    rows = await conn.fetch(f"SELECT {column_name} FROM {table_name}")
-    return {normalize_text_unit(row[column_name]) for row in rows}
+async def invalidate_document_analysis(conn: asyncpg.Connection, client_id: int, reason: str) -> None:
+    await invalidate_analysis(conn, client_id, reason, DOCUMENT_ANALYSIS_TYPES)
 
 
 def parse_json_field(value: Any) -> Any:
@@ -222,11 +232,71 @@ async def get_latest_result(
     }
 
 
+async def save_analysis_result(
+    conn: asyncpg.Connection,
+    client_id: int,
+    analysis_type: str,
+    selected_document_ids: List[str],
+    params_snapshot: Dict[str, Any],
+    result: Dict[str, Any],
+) -> Dict[str, Any]:
+    row = await conn.fetchrow(
+        """
+        INSERT INTO analysis_results (
+            client_id,
+            analysis_type,
+            selected_document_ids,
+            params_snapshot,
+            result,
+            is_actual,
+            invalidation_reason,
+            updated_at
+        )
+        VALUES ($1, $2, $3::jsonb, $4::jsonb, $5::jsonb, TRUE, NULL, NOW())
+        ON CONFLICT (client_id, analysis_type)
+        DO UPDATE SET
+            selected_document_ids = EXCLUDED.selected_document_ids,
+            params_snapshot = EXCLUDED.params_snapshot,
+            result = EXCLUDED.result,
+            is_actual = TRUE,
+            invalidation_reason = NULL,
+            updated_at = NOW()
+        RETURNING analysis_type, selected_document_ids, params_snapshot, result,
+                  is_actual, invalidation_reason, created_at, updated_at
+        """,
+        client_id,
+        analysis_type,
+        json.dumps(selected_document_ids, ensure_ascii=False),
+        json.dumps(params_snapshot, ensure_ascii=False),
+        json.dumps(result, ensure_ascii=False),
+    )
+    return {
+        "analysis_type": row["analysis_type"],
+        "selected_document_ids": parse_json_field(row["selected_document_ids"]),
+        "params_snapshot": parse_json_field(row["params_snapshot"]),
+        "result": parse_json_field(row["result"]),
+        "is_actual": bool(row["is_actual"]),
+        "invalidation_reason": row["invalidation_reason"],
+        "created_at": row["created_at"].isoformat() if row["created_at"] else None,
+        "updated_at": row["updated_at"].isoformat() if row["updated_at"] else None,
+    }
+
+
 async def get_saved_seo_or_404(conn: asyncpg.Connection, client_id: int) -> Dict[str, Any]:
     latest = await get_latest_result(conn, client_id, SEO_ANALYSIS_TYPE)
     if latest is None:
         raise HTTPException(
             status_code=404,
             detail={"code": "ANALYSIS_NOT_FOUND", "message": "SEO-анализ ещё не выполнен"},
+        )
+    return latest["result"]
+
+
+async def get_saved_compare_or_404(conn: asyncpg.Connection, client_id: int) -> Dict[str, Any]:
+    latest = await get_latest_result(conn, client_id, COMPARE_ANALYSIS_TYPE)
+    if latest is None:
+        raise HTTPException(
+            status_code=404,
+            detail={"code": "ANALYSIS_NOT_FOUND", "message": "Сравнительный анализ ещё не выполнен"},
         )
     return latest["result"]
