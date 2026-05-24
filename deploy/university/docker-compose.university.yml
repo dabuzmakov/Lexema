@@ -34,9 +34,8 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       MIGRATIONS_DIR: database/migrations
     volumes:
-      - ../../scripts/db:/workspace/scripts/db:ro
-      - ../../database/migrations:/workspace/database/migrations:ro
-    command: ["bash", "-lc", "bash scripts/db/apply-migrations.sh"]
+      - ../../database:/workspace/database:ro
+    command: ["bash", "-lc", "bash database/apply-migrations.sh"]
     networks:
       - app-internal
     logging: *json-logging
@@ -52,11 +51,8 @@ services:
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       CORS_ALLOW_ORIGINS: ${CORS_ALLOWED_ORIGINS}
-    volumes:
-      - backend_corpus_data:/app/corpus_data
-      - backend_cache_data:/app/cache_data
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/docs').read()"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health').read()"]
       interval: 20s
       timeout: 5s
       retries: 5
@@ -110,8 +106,6 @@ services:
 
 volumes:
   postgres_data:
-  backend_corpus_data:
-  backend_cache_data:
   caddy_data:
   caddy_config:
 
