@@ -1,7 +1,7 @@
 import { BarChart3, Check, ChevronRight, Hash, KeyRound, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import appStyles from '../../../App/Styles.module.scss'
-import { useLockBodyScroll } from '../../../Hooks/useLockBodyScroll'
+import { useLockBodyScroll } from '../../../hooks/useLockBodyScroll'
 import { formatNumber, formatPercent } from '../../../Utils/lexema'
 import type { CompareAnalysisResult, CompareTableExportType } from '../../../Models/analysis'
 import { ChartActions } from '../SeoAnalysisPage/ChartActions'

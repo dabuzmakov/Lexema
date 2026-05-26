@@ -6,7 +6,7 @@ import { SeoAnalysisPage } from '../Components/Pages/SeoAnalysisPage'
 import { SettingsPage } from '../Components/Pages/SettingsPage'
 import { SpellingCheckPage } from '../Components/Pages/SpellingCheckPage'
 import { DocumentModal } from '../Components/Widgets/DocumentModal'
-import { useLexemaApp } from '../Hooks/useLexemaApp'
+import { useLexemaApp } from '../hooks/useLexemaApp'
 import { splitTextarea } from '../Utils/lexema'
 
 export default function App() {

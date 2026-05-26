@@ -1,14 +1,14 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from 'react'
-import { getAppState } from '../Api/appApi'
-import { runSeoAnalysis, runSpellingAnalysis } from '../Api/analysisApi'
-import { runCompareAnalysis } from '../Api/compareApi'
+import { getAppState } from '../api/appApi'
+import { runSeoAnalysis, runSpellingAnalysis } from '../api/analysisApi'
+import { runCompareAnalysis } from '../api/compareApi'
 import {
   createDocument,
   deleteDocument,
   updateDocument,
-} from '../Api/documentsApi'
-import { downloadCompareCsv, downloadSeoCsv, downloadSeoZip } from '../Api/exportApi'
-import { saveSettings } from '../Api/settingsApi'
+} from '../api/documentsApi'
+import { downloadCompareCsv, downloadSeoCsv, downloadSeoZip } from '../api/exportApi'
+import { saveSettings } from '../api/settingsApi'
 import {
   DEFAULT_DISPLAY_SETTINGS,
   DISPLAY_SETTINGS_STORAGE_KEY,
