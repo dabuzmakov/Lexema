@@ -40,8 +40,9 @@ for file in "${migration_files[@]}"; do
   filename="$(basename "$file")"
 
   already_applied="$(
-    psql "$DATABASE_URL" -At -v ON_ERROR_STOP=1 -v filename="$filename" \
-      -c "SELECT 1 FROM schema_migrations WHERE filename = :'filename' LIMIT 1;"
+    psql "$DATABASE_URL" -At -v ON_ERROR_STOP=1 -v filename="$filename" <<'SQL'
+SELECT 1 FROM schema_migrations WHERE filename = :'filename' LIMIT 1;
+SQL
   )"
   if [[ "$already_applied" == "1" ]]; then
     echo "Skipping already applied migration: $filename"
@@ -50,8 +51,9 @@ for file in "${migration_files[@]}"; do
 
   echo "Applying migration: $filename"
   psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$file"
-  psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -v filename="$filename" \
-    -c "INSERT INTO schema_migrations (filename) VALUES (:'filename');"
+  psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -v filename="$filename" <<'SQL'
+INSERT INTO schema_migrations (filename) VALUES (:'filename');
+SQL
 done
 
 echo "Migration process completed."
