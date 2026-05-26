@@ -1,217 +1,162 @@
 # Лексема
 
-[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript)](https://www.typescriptlang.org/)
-[![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql)](https://www.postgresql.org/)
-[![Render](https://img.shields.io/badge/Render-部署-46E3B7?logo=render)](https://render.com/)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+Лексема - веб-приложение для анализа текстов. Система помогает готовить и проверять тексты по SEO-метрикам, сравнивать два документа, искать орфографические и грамматические проблемы, управлять корпусом документов и выгружать результаты анализа.
 
-Веб-приложение для частотного анализа текстов с возможностью настраивать параметры анализа и экспортировать результаты в CSV.
-
-Деплой: [https://text-analyzer-frontend-ra8y.onrender.com/](https://text-analyzer-frontend-ra8y.onrender.com/)
+Render: https://text-analyzer-frontend-ra8y.onrender.com/  
+URFU: http://10.40.241.61/ (Только из внутренней сети УрФУ)
 
 ## Возможности
 
-- загрузка `.txt` файлов через проводник и drag-and-drop;
-- создание и редактирование документов прямо в интерфейсе;
-- работа с корпусом до 30 документов;
-- частотный анализ слов по всему корпусу;
-- фильтрация по:
-  - `Top-N`
-  - минимальной длине слова
-  - порядку сортировки;
-- просмотр:
-  - общей статистики;
-  - таблицы частот;
-- экспорт:
-  - общего CSV по корпусу;
-  - CSV по выбранным документам.
+- хранение пользовательского корпуса документов по `browser_id` из браузера;
+- загрузка `.txt` файлов через файловый диалог и drag-and-drop;
+- создание, редактирование, удаление и поиск документов в интерфейсе;
+- SEO-анализ выбранных документов:
+  - частотность слов;
+  - биграммы и триграммы;
+  - проверка ключевых слов и фраз;
+  - переспам по заданному порогу плотности;
+  - водность по локальному словарю маркеров;
+  - смешение кириллицы и латиницы;
+  - структура текста по абзацам и предложениям;
+  - рекомендации и данные для графиков;
+- сравнение двух документов:
+  - различия по объему, словарю, водности, структуре и переспаму;
+  - пересечение словаря и n-грамм;
+  - cosine similarity по частотам слов;
+  - сравнение покрытия ключевых слов;
+- орфографическая проверка через локальный LanguageTool;
+- настройка стоп-слов, ключевых слов, лемматизации, n-грамм и порога переспама;
+- сохранение последних результатов анализа в PostgreSQL;
+- экспорт SEO и сравнительных таблиц в CSV, а SEO-отчета - в ZIP через API;
 
 ## Архитектура
 
-Проект состоит из трех основных частей:
-
-- `frontend` — клиентское приложение на React + TypeScript;
-- `backend` — REST API на FastAPI;
-- `database` — схема PostgreSQL и SQL-миграции.
-
-Дополнительно в репозитории есть:
-
-- `scripts/db` — скрипты применения миграций;
-- `.github/workflows` — CI и миграции;
-- `render.yaml` — конфигурация деплоя на Render.
-
-## Стек
-
-### Frontend
-
-- React 19
-- TypeScript
-- Vite
-- CSS Modules
-- lucide-react
-
-### Backend
-
-- Python 3.12
-- FastAPI
-- Pydantic
-
-### Database / Infra
-
-- PostgreSQL
-- GitHub Actions
-- Render
-
-## Структура репозитория
-
 ```text
 text-analyzer/
-├─ backend/                  # FastAPI backend
-├─ frontend/                 # React/Vite frontend
-├─ database/migrations/      # SQL-миграции
-├─ scripts/db/               # запуск миграций
-├─ .github/workflows/        # CI / DB migration workflows
-├─ API.md                    # описание API
-├─ render.yaml               # deploy config
+├─ backend/                    # FastAPI backend
+│  ├─ routers/                 # HTTP endpoints
+│  ├─ services/                # SEO, compare, spelling, export, text utilities
+│  ├─ resources/dictionaries/  # локальные словари stop/water words
+│  └─ tests/                   # backend contract/service tests
+├─ frontend/                   # React 19 + TypeScript + Vite
+│  └─ src/
+│     ├─ Api/                  # frontend API client
+│     ├─ App/                  # корневой компонент
+│     ├─ Components/           # страницы, layout, UI, widgets
+│     ├─ Hooks/                # состояние приложения
+│     ├─ Models/               # TypeScript-контракты
+│     ├─ Styles/               # SCSS
+│     └─ Utils/                # browser_id, форматирование, markdown, нормализация
+├─ database/migrations/        # PostgreSQL migrations
+├─ deploy/university/          # Docker/Caddy/Nginx для сервера вуза
+├─ render.yaml                 # Render Blueprint
+├─ API.md                      # полный контракт API
 └─ README.md
 ```
 
-## Быстрый старт
+## Технологии
 
-### 1. Backend
+- Frontend: React 19, TypeScript, Vite, SCSS Modules, lucide-react.
+- Backend: Python 3.12, FastAPI, Pydantic, asyncpg.
+- Анализ текста: pymorphy3 для русской лемматизации, локальные UTF-8 словари, LanguageTool через `language-tool-python`.
+- База данных: PostgreSQL 16.
+- Деплой: Render Blueprint и Docker Compose для внутреннего сервера.
+- CI: GitHub Actions для миграций, frontend build, backend tests и smoke checks.
 
-```bash
-cd backend
-python -m venv .venv
+## Модель данных и состояние
+
+Приложение не использует регистрацию пользователей. Frontend создает и хранит в `localStorage` идентификатор `lexema_browser_id`, а backend связывает его с записью в `app_clients`.
+
+Основные сущности:
+
+- `app_clients` - browser-клиенты приложения.
+- `documents` - документы клиента, их содержимое, количество символов и грубое количество слов.
+- `analysis_settings` - настройки анализа клиента.
+- `analysis_results` - последний результат каждого типа анализа: `seo`, `compare`, `spelling`.
+- `schema_migrations` - примененные SQL-миграции.
+
+Backend не создает схему базы при старте. Перед рабочим запуском нужно применить SQL-миграции.
+
+## Backend API
+
+Подробный контракт находится в [API.md](./API.md).
+
+Основные группы endpoint'ов:
+
+- `GET /health` - healthcheck без проверки LanguageTool.
+- `GET /app/state` - начальное состояние frontend после reload.
+- `/documents` - CRUD документов.
+- `/settings` - чтение и сохранение настроек анализа.
+- `/analysis/seo` - SEO-анализ выбранных документов.
+- `/analysis/compare` - сравнение двух документов.
+- `/analysis/spelling` - проверка выбранных документов через LanguageTool.
+- `/export/csv/...` и `/export/zip/seo` - экспорт сохраненных результатов.
+
+Все JSON-ответы успешных endpoints, кроме `/health` и файлового экспорта, возвращаются в envelope:
+
+```json
+{
+  "status": "success",
+  "data": {}
+}
 ```
-
-Windows:
-
-```bash
-.venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-macOS / Linux:
-
-```bash
-source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-Backend будет доступен на `http://localhost:8000`.
-
-### 2. Frontend
-
-```bash
-cd frontend
-npm install
-```
-
-Создай `frontend/.env.local`:
-
-```env
-VITE_USE_MOCK_API=false
-VITE_API_BASE_URL=http://localhost:8000
-```
-
-Запуск:
-
-```bash
-npm run dev
-```
-
-Frontend будет доступен на `http://127.0.0.1:5173`.
-
-### 3. Миграции базы данных
-
-Если нужно применить SQL-миграции вручную:
-
-```bash
-export DATABASE_URL=postgresql://user:password@host:5432/dbname
-bash scripts/db/apply-migrations.sh
-```
-
-Для Windows удобнее запускать из Git Bash / WSL.
 
 ## Переменные окружения
 
-### Frontend
-
-- `VITE_USE_MOCK_API`
-  - `true` — использовать mock API;
-  - `false` — использовать реальный backend.
-- `VITE_API_BASE_URL`
-  - базовый URL backend.
-
 ### Backend
 
-- `DATABASE_URL`
-  - строка подключения к PostgreSQL;
-- `CORS_ALLOW_ORIGINS`
-  - список разрешенных origin'ов для CORS.
-
-## Команды
+| Переменная | Назначение | Значение по умолчанию |
+| --- | --- | --- |
+| `DATABASE_URL` | PostgreSQL connection string. Если не задана, все endpoints с БД вернут 503. | нет |
+| `CORS_ALLOW_ORIGINS` | Список разрешенных origins через запятую. | localhost-порты и Render frontend |
+| `DB_POOL_MIN_SIZE` | Минимальный размер asyncpg pool на worker. | `1` |
+| `DB_POOL_MAX_SIZE` | Максимальный размер asyncpg pool на worker. | `8` |
+| `SEO_ANALYSIS_CONCURRENCY` | Одновременные SEO-анализы на worker. | `2` |
+| `COMPARE_ANALYSIS_CONCURRENCY` | Одновременные compare-анализы на worker. | `1` |
+| `SPELLING_ANALYSIS_CONCURRENCY` | Одновременные LanguageTool-проверки на worker. | `1` |
+| `MAX_DOCUMENTS_PER_CLIENT` | Максимум документов на browser-клиента. | `30` |
+| `MAX_DOCUMENT_CHARS` | Максимум символов в одном документе. | `150000` |
+| `MAX_TOTAL_CHARS_PER_SEO_ANALYSIS` | Максимальный суммарный объем выбранных документов для SEO. | `300000` |
+| `MAX_TOTAL_CHARS_PER_SPELLING_ANALYSIS` | Максимальный суммарный объем для орфографической проверки. | `100000` |
+| `MAX_DOCUMENT_CHARS_PER_COMPARE` | Максимальный объем каждого документа в сравнении. | `150000` |
 
 ### Frontend
 
+| Переменная | Назначение |
+| --- | --- |
+| `VITE_API_BASE_URL` | Base URL backend API. Для Render это URL backend-сервиса. Для сервера вуза обычно `http://<server>/api`. |
+| `VITE_USE_MOCK_API` | `true` включает mock API только в Vite dev mode. В production должно быть `false`. |
+| `VITE_MOCK_SCENARIO` | Mock-сценарий: `empty`, `documents`, `seo_done`, `stale`. |
+| `VITE_MOCK_DELAY_MS` | Искусственная задержка mock API в миллисекундах. |
+
+## Миграции базы данных
+
+Миграции лежат в `database/migrations` и применяются скриптом:
+
 ```bash
-npm run dev
-npm run build
-npm run preview
+export DATABASE_URL=postgresql://user:password@host:5432/dbname
+bash database/apply-migrations.sh
 ```
 
-### Backend
+Скрипт:
 
-```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-python -m compileall main.py
-```
+- требует установленный `psql`;
+- создает таблицу `schema_migrations`;
+- применяет только еще не примененные `.sql` файлы;
+- останавливается при первой SQL-ошибке.
 
-## API
+Актуальный порядок миграций:
 
-Основные endpoint'ы:
-
-- `PUT /corpus`
-- `POST /analysis/run`
-- `GET /export/csv/{identifier}`
-
-Подробный контракт описан в [API.md](./API.md).
-
-## CI / Deploy
-
-В проекте уже настроены:
-
-- `CI` workflow:
-  - проверка SQL-схемы;
-  - сборка frontend;
-  - smoke-check backend;
-- `DB Migrations (Render Only)` workflow для применения миграций;
-- `render.yaml` для frontend, backend и PostgreSQL.
+1. `001_create_app_clients.sql`
+2. `002_create_documents.sql`
+3. `003_create_analysis_settings.sql`
+4. `004_create_analysis_results.sql`
+5. `005_add_analysis_lookup_indexes.sql`
 
 ## Команда
 
-### Frontend
-
-- Бузмаков Даниил Александрович
-
-### Backend
-
-- Бусыгин Степан Алексеевич
-
-### DevOps / База данных
-
-- Костарев Егор Евгеньевич
-
-### TeamLead / Документация / Аналитика
-
-- Губин Павел Сергеевич
-
-### Тестирование
-
-- Четвертных Лев Константинович
+- Frontend: Бузмаков Даниил Александрович
+- Backend: Бусыгин Степан Алексеевич
+- DevOps / database: Костарев Егор Евгеньевич
+- TeamLead / документация / аналитика: Губин Павел Сергеевич
+- Тестирование: Четвертных Лев Константинович
