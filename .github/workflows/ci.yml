@@ -42,7 +42,7 @@ jobs:
       - name: Apply DB migration
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/text_analyzer
-        run: bash scripts/db/apply-migrations.sh
+        run: bash database/apply-migrations.sh
 
       - name: Validate required DB objects
         env:
@@ -52,40 +52,35 @@ jobs:
           DO \$\$
           DECLARE
             required_count INTEGER;
-            trigger_count INTEGER;
-            function_count INTEGER;
+            migration_count INTEGER;
           BEGIN
             SELECT COUNT(*) INTO required_count
             FROM information_schema.tables
             WHERE table_schema = 'public'
               AND table_name IN (
                 'app_clients',
-                'documents'
+                'documents',
+                'analysis_settings',
+                'analysis_results',
+                'schema_migrations'
               );
 
-            IF required_count <> 2 THEN
-              RAISE EXCEPTION 'Schema validation failed: expected 2 required tables, got %', required_count;
+            IF required_count <> 5 THEN
+              RAISE EXCEPTION 'Schema validation failed: expected 5 required tables, got %', required_count;
             END IF;
 
-            SELECT COUNT(*) INTO trigger_count
-            FROM pg_trigger
-            WHERE NOT tgisinternal
-              AND tgname = 'trg_documents_limit_per_client_before_insert';
-
-            IF trigger_count <> 1 THEN
-              RAISE EXCEPTION 'Schema validation failed: expected trigger trg_documents_limit_per_client_before_insert';
-            END IF;
-
-            SELECT COUNT(*) INTO function_count
-            FROM pg_proc
-            WHERE proname IN (
-              'get_client_id_by_browser_id',
-              'get_client_documents',
-              'get_client_documents_by_browser_id'
+            SELECT COUNT(*) INTO migration_count
+            FROM schema_migrations
+            WHERE filename IN (
+              '001_create_app_clients.sql',
+              '002_create_documents.sql',
+              '003_create_analysis_settings.sql',
+              '004_create_analysis_results.sql',
+              '005_add_analysis_lookup_indexes.sql'
             );
 
-            IF function_count <> 3 THEN
-              RAISE EXCEPTION 'Schema validation failed: expected 3 helper SQL functions, got %', function_count;
+            IF migration_count <> 5 THEN
+              RAISE EXCEPTION 'Schema validation failed: expected 5 recorded migrations, got %', migration_count;
             END IF;
           END
           \$\$;
@@ -147,13 +142,25 @@ jobs:
           cache: pip
           cache-dependency-path: backend/requirements.txt
 
+      - name: Install Java runtime
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openjdk-17-jre-headless
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install pytest==8.3.5
 
-      - name: Compile backend entrypoint
-        run: python -m compileall main.py services
+      - name: Compile backend
+        run: python -m compileall .
+
+      - name: Run backend tests
+        run: python -m pytest tests
+
+      - name: Check spelling engine prerequisites
+        run: python scripts/check_spelling_engine.py --runtime-only
 
       - name: Import ASGI app
         run: python -c "from main import app; assert app.title == 'Лексема API'"

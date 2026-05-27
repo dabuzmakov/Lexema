@@ -19,4 +19,4 @@ jobs:
           sudo apt-get install -y postgresql-client
 
       - name: Apply migrations to Render DB
-        run: bash scripts/db/apply-migrations.sh
+        run: bash database/apply-migrations.sh

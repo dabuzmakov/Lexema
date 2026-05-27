@@ -1,7 +1,7 @@
 import { FilePlus, X } from 'lucide-react'
 import type { FormEvent } from 'react'
 import styles from '../../../App/Styles.module.scss'
-import { useLockBodyScroll } from '../../../Hooks/useLockBodyScroll'
+import { useLockBodyScroll } from '../../../hooks/useLockBodyScroll'
 import type { DocumentModalState } from '../../../Models/ui'
 
 export function DocumentModal({

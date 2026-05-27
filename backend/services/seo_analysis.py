@@ -1,11 +1,15 @@
+from __future__ import annotations
+
 import re
 from collections import Counter
 from typing import Any, Dict, List, Set
 
-import asyncpg
+from starlette.concurrency import run_in_threadpool
 
 from constants import MIXED_LAYOUT_MAP
-from repositories import load_words_table, split_terms
+from repositories import split_terms
+from services.dictionaries import get_ru_stop_words, get_ru_water_dictionary
+from services.analysis_runtime import get_seo_analysis_semaphore
 from schemas import AnalysisSettings
 from services.structure_analysis import analyze_text_structure, build_structure_charts
 from services.text_utils import normalize_phrase, normalize_text_unit, tokenize
@@ -58,29 +62,25 @@ def build_chart_rows(rows: List[Dict[str, Any]], label_key: str) -> List[Dict[st
     return [{"label": row[label_key], "value": row["count"]} for row in rows[:12]]
 
 
-def count_water_markers(tokens: List[str], stop_words: Set[str], water_markers: Set[str]) -> Counter:
+def count_water_markers(tokens: List[str], normalized_text: str, water_words: Set[str], water_phrases: Set[str]) -> Counter:
     counter: Counter[str] = Counter()
     covered_indexes: Set[int] = set()
-    phrase_markers = sorted(
-        (marker.split() for marker in water_markers if " " in marker),
-        key=len,
-        reverse=True,
-    )
+    normalized_tokens = normalized_text.split()
+    phrase_markers = sorted((phrase.split() for phrase in water_phrases), key=len, reverse=True)
 
     for phrase_parts in phrase_markers:
         phrase_length = len(phrase_parts)
-        if phrase_length == 0 or phrase_length > len(tokens):
+        if phrase_length == 0 or phrase_length > len(normalized_tokens):
             continue
 
-        for start in range(0, len(tokens) - phrase_length + 1):
+        for start in range(0, len(normalized_tokens) - phrase_length + 1):
             indexes = set(range(start, start + phrase_length))
             if indexes & covered_indexes:
                 continue
-            if tokens[start : start + phrase_length] == phrase_parts:
+            if normalized_tokens[start : start + phrase_length] == phrase_parts:
                 counter[" ".join(phrase_parts)] += 1
                 covered_indexes.update(indexes)
 
-    water_words = stop_words | {marker for marker in water_markers if " " not in marker}
     for index, token in enumerate(tokens):
         if index not in covered_indexes and token in water_words:
             counter[token] += 1
@@ -88,20 +88,18 @@ def count_water_markers(tokens: List[str], stop_words: Set[str], water_markers: 
     return counter
 
 
-async def build_seo_result(
-    conn: asyncpg.Connection,
+def build_seo_result_sync(
     documents: List[Dict[str, Any]],
     settings: AnalysisSettings,
 ) -> Dict[str, Any]:
     lemmatize = settings.lemmatization
     default_stop_words = {
         normalize_phrase(word, lemmatize=lemmatize)
-        for word in await load_words_table(conn, "default_stop_words", "word")
+        for word in get_ru_stop_words()
     }
-    water_markers = {
-        normalize_phrase(marker, lemmatize=lemmatize)
-        for marker in await load_words_table(conn, "water_markers", "marker")
-    }
+    water_dictionary = get_ru_water_dictionary()
+    water_words = {normalize_phrase(word, lemmatize=lemmatize) for word in water_dictionary["words"]}
+    water_phrases = {normalize_phrase(phrase) for phrase in water_dictionary["phrases"]}
     custom_stop_words = {normalize_phrase(word, lemmatize=lemmatize) for word in split_terms(settings.stop_words.custom)}
 
     if settings.stop_words.mode == "off":
@@ -121,6 +119,7 @@ async def build_seo_result(
     raw_tokens: List[str] = []
     original_tokens: List[str] = []
     combined_text = "\n".join(document["content"] for document in documents)
+    normalized_combined_text = normalize_phrase(combined_text)
     structure = analyze_text_structure(combined_text)
     for document in documents:
         raw_tokens.extend(tokenize(document["content"], lemmatize=lemmatize))
@@ -204,7 +203,7 @@ async def build_seo_result(
                 }
             )
 
-    water_marker_counter = count_water_markers(raw_tokens, stop_words, water_markers)
+    water_marker_counter = count_water_markers(raw_tokens, normalized_combined_text, water_words, water_phrases)
     water_units_count = sum(water_marker_counter.values())
 
     water_percent = round(water_units_count / max(1, total_words) * 100, 2)
@@ -283,7 +282,7 @@ async def build_seo_result(
         "recommendations": recommendations,
         "lexicon": {
             "stop_words": sorted(stop_words),
-            "water_markers": sorted(water_markers),
+            "water_markers": sorted(water_words | water_phrases),
         },
         "charts": {
             "top_words": build_chart_rows(words, "word"),
@@ -294,3 +293,11 @@ async def build_seo_result(
             "structure": build_structure_charts(structure),
         },
     }
+
+
+async def build_seo_result(
+    documents: List[Dict[str, Any]],
+    settings: AnalysisSettings,
+) -> Dict[str, Any]:
+    async with get_seo_analysis_semaphore():
+        return await run_in_threadpool(build_seo_result_sync, documents, settings)

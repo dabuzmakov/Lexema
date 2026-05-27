@@ -1,7 +1,7 @@
 import { BarChart3, Check, ChevronRight, Hash, KeyRound, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import styles from '../../../../App/Styles.module.scss'
-import { useLockBodyScroll } from '../../../../Hooks/useLockBodyScroll'
+import { useLockBodyScroll } from '../../../../hooks/useLockBodyScroll'
 import { formatNumber, formatPercent } from '../../../../Utils/lexema'
 import type { SeoResult, SeoTableExportType } from '../../../../Models/analysis'
 import { PNG_EXPORT_ROW_LIMIT } from '../constants'
