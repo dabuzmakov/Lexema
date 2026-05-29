@@ -115,9 +115,9 @@ Backend не создает схему базы при старте. Перед 
 | `COMPARE_ANALYSIS_CONCURRENCY` | Одновременные compare-анализы на worker. | `1` |
 | `SPELLING_ANALYSIS_CONCURRENCY` | Одновременные LanguageTool-проверки на worker. | `1` |
 | `MAX_DOCUMENTS_PER_CLIENT` | Максимум документов на browser-клиента. | `30` |
-| `MAX_DOCUMENT_CHARS` | Максимум символов в одном документе. | `150000` |
-| `MAX_TOTAL_CHARS_PER_SEO_ANALYSIS` | Максимальный суммарный объем выбранных документов для SEO. | `300000` |
-| `MAX_TOTAL_CHARS_PER_SPELLING_ANALYSIS` | Максимальный суммарный объем для орфографической проверки. | `100000` |
+| `MAX_DOCUMENT_CHARS` | Максимум символов в одном документе. | `50000` |
+| `MAX_TOTAL_CHARS_PER_SEO_ANALYSIS` | Максимальный суммарный объем выбранных документов для SEO. | `1500000` |
+| `MAX_TOTAL_CHARS_PER_SPELLING_ANALYSIS` | Максимальный суммарный объем для орфографической проверки. | `1500000` |
 | `MAX_DOCUMENT_CHARS_PER_COMPARE` | Максимальный объем каждого документа в сравнении. | `150000` |
 
 ### Frontend
@@ -125,9 +125,6 @@ Backend не создает схему базы при старте. Перед 
 | Переменная | Назначение |
 | --- | --- |
 | `VITE_API_BASE_URL` | Base URL backend API. Для Render это URL backend-сервиса. Для сервера вуза обычно `http://<server>/api`. |
-| `VITE_USE_MOCK_API` | `true` включает mock API только в Vite dev mode. В production должно быть `false`. |
-| `VITE_MOCK_SCENARIO` | Mock-сценарий: `empty`, `documents`, `seo_done`, `stale`. |
-| `VITE_MOCK_DELAY_MS` | Искусственная задержка mock API в миллисекундах. |
 
 ## Миграции базы данных
 

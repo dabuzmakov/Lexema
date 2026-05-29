@@ -7,7 +7,7 @@ export function LoadingScreen() {
       <div className={styles.logoMark}>
         <LogoMark />
       </div>
-      <p>Ð—Ð°Ð³Ñ€ÑƒÐ¶Ð°ÐµÐ¼ Ð›ÐµÐºÑÐµÐ¼Ñƒ...</p>
+      <p>Загружаем Лексему...</p>
     </div>
   )
 }

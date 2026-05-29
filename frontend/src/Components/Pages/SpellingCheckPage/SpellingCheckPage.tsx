@@ -5,7 +5,7 @@ import { formatCount } from '../../../Utils/lexema'
 import type { SpellingCategory, SpellingIssue } from '../../../Models/analysis'
 import { PageHeader } from '../../Layouts/PageHeader'
 import { SilentDropUploadArea } from '../../Widgets/SilentDropUploadArea'
-import { SPELLING_CATEGORY_ORDER, normalizeSpellingCategory } from './constants'
+import { SPELLING_CATEGORY_ORDER, isKnownSpellingCategory, normalizeSpellingCategory } from './constants'
 import { SpellingDocumentSelector } from './SpellingDocumentSelector'
 import { SpellingIssuesList } from './SpellingIssuesList'
 import { SpellingSummaryCard } from './SpellingSummaryCard'
@@ -35,7 +35,14 @@ export function SpellingCheckPage({
     ?? null
   const currentResult = result?.documents.find((document) => document.document_id === currentDocument?.id)
     ?? null
-  const currentIssues = currentResult?.issues ?? []
+  const currentIssues = useMemo(
+    () => (currentResult?.issues ?? []).filter((issue) => isKnownSpellingCategory(issue.category)),
+    [currentResult],
+  )
+  const displayCurrentResult = useMemo(
+    () => currentResult ? { ...currentResult, issues: currentIssues, issues_count: currentIssues.length } : null,
+    [currentIssues, currentResult],
+  )
 
   const issueCounts = useMemo(() => buildIssueCounts(result?.documents.flatMap((document) => document.issues) ?? []), [result])
   const currentIssueCounts = useMemo(() => buildIssueCounts(currentIssues), [currentIssues])
@@ -137,7 +144,7 @@ export function SpellingCheckPage({
         <div className={styles.resultGrid}>
           <SpellingTextPreview
             currentDocument={currentDocument}
-            currentResult={currentResult}
+            currentResult={displayCurrentResult}
             documents={documents}
             issueCounts={currentIssueCounts}
             onSetCurrentDocument={onSetCurrentDocument}
@@ -157,6 +164,9 @@ function buildIssueCounts(issues: SpellingIssue[]) {
   }, {})
 
   issues.forEach((issue) => {
+    if (!isKnownSpellingCategory(issue.category as SpellingCategory)) {
+      return
+    }
     const category = normalizeSpellingCategory(issue.category as SpellingCategory)
     counts[category] += 1
   })

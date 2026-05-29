@@ -167,7 +167,7 @@ def test_spelling_extra_branches(monkeypatch):
     assert spelling_analysis.normalize_category(Match(category="typography")) == "typography"
     assert spelling_analysis.normalize_category(Match(category="style")) == "style"
     assert spelling_analysis.normalize_category(Match(category="punctuation")) == "punctuation"
-    assert spelling_analysis.normalize_category(Match(category="other")) == "other"
+    assert spelling_analysis.normalize_category(Match(category="other")) is None
     assert spelling_analysis.get_match_value(object(), "missing", default="fallback") == "fallback"
 
     counted = spelling_analysis.count_categories(
@@ -179,7 +179,6 @@ def test_spelling_extra_branches(monkeypatch):
                     {"category": "style"},
                     {"category": "typography"},
                     {"category": "punctuation"},
-                    {"category": "other"},
                 ]
             }
         ]
@@ -190,7 +189,6 @@ def test_spelling_extra_branches(monkeypatch):
         "style_count": 1,
         "typography_count": 1,
         "punctuation_count": 1,
-        "other_count": 1,
     }
 
     class FakeTool:

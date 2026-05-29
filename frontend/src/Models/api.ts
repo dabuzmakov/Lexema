@@ -9,7 +9,13 @@ export interface ApiEnvelope<T> {
 }
 
 export interface ApiErrorPayload {
-  detail?: string | { code?: string; message?: string } | Array<{ msg?: string }>
+  detail?: string | {
+    actual?: number
+    code?: string
+    limit?: number
+    message?: string
+    missing_document_ids?: string[]
+  } | Array<{ msg?: string }>
   message?: string
   status?: string
 }

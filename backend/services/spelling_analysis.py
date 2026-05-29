@@ -1,7 +1,7 @@
 import re
 import threading
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Literal, Tuple
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
 from starlette.concurrency import run_in_threadpool
 
@@ -25,8 +25,8 @@ class SpellingEngineUnavailable(RuntimeError):
 
 
 def detect_language(text: str) -> LanguageCode:
-    cyrillic_count = len(CYRILLIC_RE.findall(text))
-    latin_count = len(LATIN_RE.findall(text))
+    cyrillic_count = sum(1 for _ in CYRILLIC_RE.finditer(text))
+    latin_count = sum(1 for _ in LATIN_RE.finditer(text))
 
     if cyrillic_count >= latin_count:
         return "ru-RU"
@@ -56,7 +56,7 @@ def get_language_tool(language: LanguageCode) -> Any:
         return tool
 
 
-def normalize_category(match: Any) -> str:
+def normalize_category(match: Any) -> Optional[str]:
     category = str(getattr(match, "category", "") or "").lower()
     rule_issue_type = str(get_match_value(match, "rule_issue_type", "ruleIssueType", default="") or "").lower()
     rule_id = str(get_match_value(match, "rule_id", "ruleId", default="") or "").lower()
@@ -72,7 +72,7 @@ def normalize_category(match: Any) -> str:
         return "style"
     if "punctuation" in combined:
         return "punctuation"
-    return "other"
+    return None
 
 
 def severity_for_category(category: str) -> str:
@@ -97,7 +97,7 @@ def normalize_issue(
     language: LanguageCode,
     index: int,
     text: str,
-) -> Dict[str, Any]:
+) -> Optional[Dict[str, Any]]:
     offset = int(get_match_value(match, "offset", default=0) or 0)
     length = int(get_match_value(match, "error_length", "errorLength", "length", default=0) or 0)
     context = str(get_match_value(match, "context", default="") or "")
@@ -105,6 +105,8 @@ def normalize_issue(
     replacements = list(get_match_value(match, "replacements", default=[]) or [])
     rule_id = str(get_match_value(match, "rule_id", "ruleId", default="UNKNOWN_RULE") or "UNKNOWN_RULE")
     category = normalize_category(match)
+    if category is None:
+        return None
 
     return {
         "id": f"{document_id}:{index}:{rule_id}:{offset}",
@@ -137,8 +139,9 @@ def check_document(document: Dict[str, Any]) -> Dict[str, Any]:
         raise SpellingEngineUnavailable("SPELLING_ENGINE_UNAVAILABLE") from exc
 
     issues = [
-        normalize_issue(match, document_id, language, index, content)
+        issue
         for index, match in enumerate(matches, start=1)
+        if (issue := normalize_issue(match, document_id, language, index, content)) is not None
     ]
 
     return {
@@ -155,30 +158,26 @@ def check_document(document: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def count_categories(documents: List[Dict[str, Any]]) -> Dict[str, int]:
+    category_keys = {
+        "spelling": "spelling_count",
+        "grammar": "grammar_count",
+        "style": "style_count",
+        "typography": "typography_count",
+        "punctuation": "punctuation_count",
+    }
     counters = {
         "spelling_count": 0,
         "grammar_count": 0,
         "style_count": 0,
         "typography_count": 0,
         "punctuation_count": 0,
-        "other_count": 0,
     }
 
     for document in documents:
         for issue in document["issues"]:
-            category = issue["category"]
-            if category == "spelling":
-                counters["spelling_count"] += 1
-            elif category == "grammar":
-                counters["grammar_count"] += 1
-            elif category == "style":
-                counters["style_count"] += 1
-            elif category == "typography":
-                counters["typography_count"] += 1
-            elif category == "punctuation":
-                counters["punctuation_count"] += 1
-            else:
-                counters["other_count"] += 1
+            key = category_keys.get(issue["category"])
+            if key is not None:
+                counters[key] += 1
 
     return counters
 

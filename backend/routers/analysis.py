@@ -6,6 +6,7 @@ from fastapi import APIRouter, HTTPException
 
 from config import (
     COMPARE_ANALYSIS_TYPE,
+    MAX_DOCUMENT_CHARS,
     MAX_DOCUMENT_CHARS_PER_COMPARE,
     MAX_TOTAL_CHARS_PER_SEO_ANALYSIS,
     MAX_TOTAL_CHARS_PER_SPELLING_ANALYSIS,
@@ -213,6 +214,12 @@ async def run_spelling_analysis(request_data: SpellingAnalysisRequest):
         MAX_TOTAL_CHARS_PER_SPELLING_ANALYSIS,
         "TOTAL_SPELLING_TEXT_TOO_LARGE",
     )
+    for document in documents:
+        validate_content_size(
+            str(document.get("content") or ""),
+            MAX_DOCUMENT_CHARS,
+            "SPELLING_DOCUMENT_TOO_LARGE",
+        )
     started_at = time.perf_counter()
     logger.info(
         "spelling_analysis started docs_count=%s total_chars=%s",
