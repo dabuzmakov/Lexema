@@ -8,6 +8,7 @@ import {
   updateDocument,
 } from '../api/documentsApi'
 import { downloadCompareCsv, downloadSeoCsv, downloadSeoZip } from '../api/exportApi'
+import { getFriendlyErrorMessage } from '../api/http'
 import { saveSettings } from '../api/settingsApi'
 import {
   DEFAULT_DISPLAY_SETTINGS,
@@ -208,7 +209,7 @@ export function useLexemaApp() {
   const canUpload = documents.length < MAX_DOCUMENTS && !isDocumentSaving
 
   function showMessage(nextMessage: string, variant: AppMessage['variant'] = 'info') {
-    setMessage({ text: nextMessage, variant })
+    setMessage({ text: getFriendlyErrorMessage(nextMessage), variant })
     window.setTimeout(() => setMessage(null), 2600)
   }
 
@@ -603,9 +604,7 @@ export function useLexemaApp() {
       showMessage('Проверка орфографии выполнена')
     } catch (error) {
       const rawMessage = error instanceof Error ? error.message : 'Не удалось выполнить проверку орфографии'
-      const message = rawMessage === 'SPELLING_ENGINE_UNAVAILABLE'
-        ? 'Сервис проверки орфографии временно недоступен. Проверьте, что на сервере настроен LanguageTool/Java.'
-        : rawMessage
+      const message = getFriendlyErrorMessage(rawMessage)
       setSpellingErrorMessage(message)
       showMessage(message)
     } finally {

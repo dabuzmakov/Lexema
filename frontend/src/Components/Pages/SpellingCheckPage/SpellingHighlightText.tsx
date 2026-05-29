@@ -1,6 +1,53 @@
+import { useMemo } from 'react'
 import type { SpellingIssue } from '../../../Models/analysis'
 import { normalizeSpellingCategory } from './constants'
 import styles from './Styles.module.scss'
+
+type HighlightIssue = SpellingIssue & { end: number }
+
+const severityWeight: Record<string, number> = {
+  error: 30,
+  warning: 20,
+  info: 10,
+}
+
+const categoryWeight: Record<string, number> = {
+  spelling: 30,
+  grammar: 20,
+  punctuation: 20,
+  style: 10,
+  typography: 10,
+}
+
+function getIssueWeight(issue: SpellingIssue) {
+  return Math.max(
+    severityWeight[issue.severity] ?? 0,
+    categoryWeight[normalizeSpellingCategory(issue.category)] ?? 0,
+  )
+}
+
+function choosePrimaryIssue(issues: HighlightIssue[]) {
+  return issues.reduce((best, issue) => {
+    const weightDiff = getIssueWeight(issue) - getIssueWeight(best)
+    if (weightDiff > 0) {
+      return issue
+    }
+    if (weightDiff < 0) {
+      return best
+    }
+
+    const issueLength = issue.end - issue.offset
+    const bestLength = best.end - best.offset
+    if (issueLength > bestLength) {
+      return issue
+    }
+    if (issueLength < bestLength) {
+      return best
+    }
+
+    return issue.offset < best.offset ? issue : best
+  })
+}
 
 function getSafeIssues(text: string, issues: SpellingIssue[]) {
   const sorted = issues
@@ -17,16 +64,31 @@ function getSafeIssues(text: string, issues: SpellingIssue[]) {
     )
     .sort((left, right) => left.offset - right.offset || left.length - right.length)
 
-  const result: typeof sorted = []
-  let cursor = 0
+  const result: HighlightIssue[] = []
+  let overlapping: HighlightIssue[] = []
+  let overlappingEnd = 0
 
   sorted.forEach((issue) => {
-    if (issue.offset < cursor) {
+    if (overlapping.length === 0) {
+      overlapping = [issue]
+      overlappingEnd = issue.end
       return
     }
-    result.push(issue)
-    cursor = issue.end
+
+    if (issue.offset < overlappingEnd) {
+      overlapping.push(issue)
+      overlappingEnd = Math.max(overlappingEnd, issue.end)
+      return
+    }
+
+    result.push(choosePrimaryIssue(overlapping))
+    overlapping = [issue]
+    overlappingEnd = issue.end
   })
+
+  if (overlapping.length > 0) {
+    result.push(choosePrimaryIssue(overlapping))
+  }
 
   return result
 }
@@ -40,33 +102,37 @@ export function SpellingHighlightText({
   showHighlights: boolean
   text: string
 }) {
-  if (!showHighlights || issues.length === 0) {
-    return <p>{text}</p>
-  }
-
-  const ranges = getSafeIssues(text, issues)
-  const chunks: Array<{ key: string; text: string; issue?: SpellingIssue }> = []
-  let cursor = 0
-
-  ranges.forEach((issue, index) => {
-    if (issue.offset > cursor) {
-      chunks.push({
-        key: `text-${index}-${cursor}`,
-        text: text.slice(cursor, issue.offset),
-      })
+  const chunks = useMemo(() => {
+    if (!showHighlights || issues.length === 0) {
+      return [{ key: 'text-full', text }]
     }
 
-    chunks.push({
-      key: issue.id || `issue-${index}`,
-      text: text.slice(issue.offset, issue.end),
-      issue,
-    })
-    cursor = issue.end
-  })
+    const ranges = getSafeIssues(text, issues)
+    const nextChunks: Array<{ key: string; text: string; issue?: SpellingIssue }> = []
+    let cursor = 0
 
-  if (cursor < text.length) {
-    chunks.push({ key: `text-tail-${cursor}`, text: text.slice(cursor) })
-  }
+    ranges.forEach((issue, index) => {
+      if (issue.offset > cursor) {
+        nextChunks.push({
+          key: `text-${index}-${cursor}`,
+          text: text.slice(cursor, issue.offset),
+        })
+      }
+
+      nextChunks.push({
+        key: issue.id || `issue-${index}`,
+        text: text.slice(issue.offset, issue.end),
+        issue,
+      })
+      cursor = issue.end
+    })
+
+    if (cursor < text.length) {
+      nextChunks.push({ key: `text-tail-${cursor}`, text: text.slice(cursor) })
+    }
+
+    return nextChunks
+  }, [issues, showHighlights, text])
 
   return (
     <p>

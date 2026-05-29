@@ -173,14 +173,14 @@ def test_app_state_endpoint_collects_documents_settings_and_results(monkeypatch)
     async def fake_fetch_documents(conn, client_id):
         return [{"id": "doc"}]
 
-    async def fake_get_latest_result(conn, client_id, analysis_type):
-        return {"analysis_type": analysis_type}
+    async def fake_get_latest_results(conn, client_id, analysis_types):
+        return {analysis_type: {"analysis_type": analysis_type} for analysis_type in analysis_types}
 
     monkeypatch.setattr(app_state, "get_client_id", fake_get_client_id)
     monkeypatch.setattr(app_state, "get_settings_record", fake_get_settings_record)
     monkeypatch.setattr(app_state, "settings_to_dict", lambda row: {"settings": True})
     monkeypatch.setattr(app_state, "fetch_documents", fake_fetch_documents)
-    monkeypatch.setattr(app_state, "get_latest_result", fake_get_latest_result)
+    monkeypatch.setattr(app_state, "get_latest_results", fake_get_latest_results)
 
     response = asyncio.run(app_state.get_app_state("browser"))
 
@@ -341,6 +341,16 @@ def test_spelling_analysis_validation_success_and_unavailable(monkeypatch):
 
     monkeypatch.setattr(analysis, "get_client_id", fake_get_client_id)
     monkeypatch.setattr(analysis, "fetch_selected_documents", fake_fetch_selected_documents)
+
+    monkeypatch.setattr(analysis, "MAX_DOCUMENT_CHARS", 3)
+    with pytest.raises(HTTPException) as too_large_error:
+        asyncio.run(
+            analysis.run_spelling_analysis(
+                SpellingAnalysisRequest(browser_id="browser", document_ids=["doc-1"])
+            )
+        )
+    assert too_large_error.value.detail["code"] == "SPELLING_DOCUMENT_TOO_LARGE"
+    monkeypatch.setattr(analysis, "MAX_DOCUMENT_CHARS", 50_000)
 
     async def fake_spelling(documents_payload):
         return {"summary": {"documents_count": len(documents_payload)}, "documents": []}

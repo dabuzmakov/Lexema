@@ -35,28 +35,28 @@ export function MixedAlphabetSection({
     >
       <div className={styles.mixedAlphabetDesktop}>
         <CustomScrollArea className={styles.mixedCompactScroll}>
-        <div className={styles.mixedCompactList}>
-          <div className={styles.mixedCompactHeader}>
-            <span>Фрагмент</span>
-            <span>Проблема</span>
-            <span>Вхождений</span>
-          </div>
-          {rows.map((item) => (
-            <div className={styles.mixedCompactRow} key={item.word}>
-              <div className={styles.mixedFragmentCell} title={item.word}>
-                <span className={styles.mixedFragmentText}>{renderMixedWord(item.word)}</span>
-              </div>
-              <div className={styles.mixedSuggestionCell}>
-                <span>Замена:</span>
-                <b title={item.suggestion}>{item.suggestion}</b>
-              </div>
-              <span className={styles.mixedCountBadge} aria-label={`${item.count} вхождений`}>
-                <span className={styles.mixedCountFull}>{item.count} вх.</span>
-                <span className={styles.mixedCountShort}>{item.count}</span>
-              </span>
+          <div className={styles.mixedCompactList}>
+            <div className={styles.mixedCompactHeader}>
+              <span>Фрагмент</span>
+              <span>Проблема</span>
+              <span>Вхождений</span>
             </div>
-          ))}
-        </div>
+            {rows.map((item) => (
+              <div className={styles.mixedCompactRow} key={item.word}>
+                <div className={styles.mixedFragmentCell} title={item.word}>
+                  <span className={styles.mixedFragmentText}>{renderMixedWord(item.word)}</span>
+                </div>
+                <div className={styles.mixedSuggestionCell}>
+                  <span>Замена:</span>
+                  <b title={item.suggestion}>{item.suggestion}</b>
+                </div>
+                <span className={styles.mixedCountBadge} aria-label={`${item.count} вхождений`}>
+                  <span className={styles.mixedCountFull}>{item.count} вх.</span>
+                  <span className={styles.mixedCountShort}>{item.count}</span>
+                </span>
+              </div>
+            ))}
+          </div>
         </CustomScrollArea>
       </div>
 
@@ -66,7 +66,7 @@ export function MixedAlphabetSection({
             <span className={styles.mixedAlphabetMobileWord} title={item.word}>
               {renderMixedWord(item.word)}
             </span>
-            <span className={styles.mixedAlphabetMobileCount} aria-label={`${item.count} Ð²Ñ…Ð¾Ð¶Ð´ÐµÐ½Ð¸Ð¹`}>
+            <span className={styles.mixedAlphabetMobileCount} aria-label={`${item.count} вхождений`}>
               {item.count}
             </span>
           </div>

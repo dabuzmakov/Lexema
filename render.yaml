@@ -33,11 +33,11 @@ services:
       - key: MAX_DOCUMENTS_PER_CLIENT
         value: "30"
       - key: MAX_DOCUMENT_CHARS
-        value: "150000"
+        value: "50000"
       - key: MAX_TOTAL_CHARS_PER_SEO_ANALYSIS
-        value: "300000"
+        value: "1500000"
       - key: MAX_TOTAL_CHARS_PER_SPELLING_ANALYSIS
-        value: "100000"
+        value: "1500000"
       - key: MAX_DOCUMENT_CHARS_PER_COMPARE
         value: "150000"
   - type: web
@@ -48,8 +48,6 @@ services:
     staticPublishPath: dist
     autoDeployTrigger: checksPass
     envVars:
-      - key: VITE_USE_MOCK_API
-        value: "false"
       - key: VITE_API_BASE_URL
         sync: false
     routes:

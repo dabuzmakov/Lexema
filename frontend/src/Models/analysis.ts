@@ -294,7 +294,6 @@ export type SpellingCategory =
   | 'punctuation'
   | 'style'
   | 'typography'
-  | 'other'
   | string
 
 export type SpellingSeverity = 'error' | 'warning' | 'info' | string
@@ -337,8 +336,6 @@ export interface SpellingSummary {
   punctuation_count?: number
   style_count: number
   typography_count: number
-  other_count?: number
-  unknown_count?: number
   languages: string[]
   checked_at: string
   engine?: string

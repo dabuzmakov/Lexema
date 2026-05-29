@@ -17,11 +17,30 @@ async def get_client_id(conn: asyncpg.Connection, browser_id: str) -> int:
 
     client_id = await conn.fetchval(
         """
-        INSERT INTO app_clients (browser_id, last_seen_at, updated_at)
-        VALUES ($1, NOW(), NOW())
-        ON CONFLICT (browser_id)
-        DO UPDATE SET last_seen_at = NOW(), updated_at = NOW()
-        RETURNING id
+        WITH inserted AS (
+            INSERT INTO app_clients (browser_id, last_seen_at, updated_at)
+            VALUES ($1, NOW(), NOW())
+            ON CONFLICT (browser_id)
+            DO NOTHING
+            RETURNING id
+        ),
+        updated AS (
+            UPDATE app_clients
+            SET last_seen_at = NOW(), updated_at = NOW()
+            WHERE browser_id = $1
+              AND last_seen_at < NOW() - INTERVAL '1 minute'
+              AND NOT EXISTS (SELECT 1 FROM inserted)
+            RETURNING id
+        )
+        SELECT id FROM inserted
+        UNION ALL
+        SELECT id FROM updated
+        UNION ALL
+        SELECT id FROM app_clients
+        WHERE browser_id = $1
+          AND NOT EXISTS (SELECT 1 FROM inserted)
+          AND NOT EXISTS (SELECT 1 FROM updated)
+        LIMIT 1
         """,
         normalized,
     )
@@ -230,6 +249,37 @@ async def get_latest_result(
         "created_at": row["created_at"].isoformat() if row["created_at"] else None,
         "updated_at": row["updated_at"].isoformat() if row["updated_at"] else None,
     }
+
+
+async def get_latest_results(
+    conn: asyncpg.Connection,
+    client_id: int,
+    analysis_types: List[str],
+) -> Dict[str, Optional[Dict[str, Any]]]:
+    rows = await conn.fetch(
+        """
+        SELECT analysis_type, selected_document_ids, params_snapshot, result,
+               is_actual, invalidation_reason, created_at, updated_at
+        FROM analysis_results
+        WHERE client_id = $1 AND analysis_type = ANY($2::text[])
+        """,
+        client_id,
+        analysis_types,
+    )
+    results = {
+        row["analysis_type"]: {
+            "analysis_type": row["analysis_type"],
+            "selected_document_ids": parse_json_field(row["selected_document_ids"]),
+            "params_snapshot": parse_json_field(row["params_snapshot"]),
+            "result": parse_json_field(row["result"]),
+            "is_actual": bool(row["is_actual"]),
+            "invalidation_reason": row["invalidation_reason"],
+            "created_at": row["created_at"].isoformat() if row["created_at"] else None,
+            "updated_at": row["updated_at"].isoformat() if row["updated_at"] else None,
+        }
+        for row in rows
+    }
+    return {analysis_type: results.get(analysis_type) for analysis_type in analysis_types}
 
 
 async def save_analysis_result(
