@@ -51,6 +51,10 @@ services:
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       CORS_ALLOW_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+      DB_POOL_MAX_SIZE: ${DB_POOL_MAX_SIZE}
+      SEO_ANALYSIS_CONCURRENCY: ${SEO_ANALYSIS_CONCURRENCY}
+      COMPARE_ANALYSIS_CONCURRENCY: ${COMPARE_ANALYSIS_CONCURRENCY}
+      SPELLING_ANALYSIS_CONCURRENCY: ${SPELLING_ANALYSIS_CONCURRENCY}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health').read()"]
       interval: 20s
