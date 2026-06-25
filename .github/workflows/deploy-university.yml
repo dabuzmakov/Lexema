@@ -60,6 +60,10 @@ jobs:
             echo "POSTGRES_DB=text_analyzer_prod"
             echo "POSTGRES_USER=text_analyzer_prod"
             echo "POSTGRES_PASSWORD=${UNI_POSTGRES_PASSWORD}"
+            echo "DB_POOL_MAX_SIZE=16"
+            echo "SEO_ANALYSIS_CONCURRENCY=8"
+            echo "COMPARE_ANALYSIS_CONCURRENCY=8"
+            echo "SPELLING_ANALYSIS_CONCURRENCY=4"
           } > deploy/university/.env.university
 
       - name: Deploy stack on self-hosted runner
